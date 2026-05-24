@@ -10,10 +10,10 @@ export abstract class BaseViewModel {
   protected readonly _createdAt: Date;
   protected _updatedAt: Date;
 
-  constructor(props: { id: string; createdAt: Date; updatedAt: Date }) {
-    this._id = props.id;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
+  constructor(id: string, createdAt: Date, updatedAt: Date) {
+    this._id = id;
+    this._createdAt = createdAt;
+    this._updatedAt = updatedAt;
   }
 
   /**
