@@ -15,6 +15,9 @@ export * from './shared/application/services/base-service/base-service.interface
 // Aggregates
 export * from './shared/domain/aggregates/base-aggregate/base.aggregate';
 
+// Builders
+export * from './shared/domain/builders/base.builder';
+
 // Entities
 export * from './shared/domain/entities/criteria';
 export * from './shared/domain/entities/paginated-result.entity';
@@ -51,6 +54,7 @@ export * from './shared/domain/exceptions/value-objects/invalid-url/invalid-url.
 export * from './shared/domain/exceptions/value-objects/invalid-uuid/invalid-uuid.exception';
 
 // Interfaces
+export * from './shared/domain/interfaces/builders/base-builder.interface';
 export * from './shared/domain/interfaces/base-aggregate-dto.interface';
 export * from './shared/domain/interfaces/base-view-model-dto.interface';
 export * from './shared/domain/interfaces/event-metadata.interface';
