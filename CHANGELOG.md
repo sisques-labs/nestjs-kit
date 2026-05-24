@@ -1,6 +1,13 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.10.0] - 2026-05-24
+
+### Chore
+- Update release workflow and add changelog generation (b2463dd)
+
+### Features
+- Add touch method to BaseAggregate for updating timestamp (1b3ce62)
 ## [0.9.0] - 2026-05-24
 
 ### Chore
