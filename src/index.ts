@@ -31,6 +31,7 @@ export * from './shared/domain/events/base-event.interface';
 
 // Exceptions
 export * from './shared/domain/exceptions/base.exception';
+export * from './shared/domain/exceptions/field-is-required.exception';
 export * from './shared/domain/exceptions/value-objects/invalid-boolean/invalid-boolean.exception';
 export * from './shared/domain/exceptions/value-objects/invalid-color/invalid-color.exception';
 export * from './shared/domain/exceptions/value-objects/invalid-dimensions/invalid-dimensions.exception';
@@ -119,9 +120,9 @@ export * from './shared/infrastructure/database/typeorm/typeorm.module';
 export * from './shared/infrastructure/kafka/interfaces/kafka-event-publisher.interface';
 
 // Schema Registry
+export * from './shared/infrastructure/kafka/schema-registry/schema-registry-options.interface';
 export * from './shared/infrastructure/kafka/schema-registry/schema-registry.module';
 export * from './shared/infrastructure/kafka/schema-registry/schema-registry.service';
-export * from './shared/infrastructure/kafka/schema-registry/schema-registry-options.interface';
 
 // ─── Transport ────────────────────────────────────────────────────────────────
 
