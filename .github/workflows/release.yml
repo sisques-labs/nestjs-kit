@@ -72,6 +72,9 @@ jobs:
           fi
           echo "version=${NEW_VERSION}" >> $GITHUB_OUTPUT
 
+      - name: Update changelog
+        run: pnpm dlx git-cliff --offline --tag ${{ steps.bump.outputs.version }} -o CHANGELOG.md
+
       - name: Build
         run: pnpm build
 
@@ -85,9 +88,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Write release notes
+        run: pnpm dlx git-cliff --offline --unreleased --tag ${{ steps.bump.outputs.version }} --strip header -o RELEASE_NOTES.md
+
       - name: Commit, tag & push
         run: |
-          git add package.json pnpm-lock.yaml
+          git add package.json pnpm-lock.yaml CHANGELOG.md
           git commit -m "chore: release ${{ steps.bump.outputs.version }}"
           git tag ${{ steps.bump.outputs.version }}
           git push origin main --follow-tags
@@ -97,5 +103,5 @@ jobs:
         with:
           tag_name: ${{ steps.bump.outputs.version }}
           name: ${{ steps.bump.outputs.version }}
-          generate_release_notes: true
+          body_path: RELEASE_NOTES.md
           prerelease: ${{ inputs.release_type != 'stable' }}

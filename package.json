@@ -36,7 +36,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "changelog": "pnpm dlx git-cliff --offline -o CHANGELOG.md",
+    "changelog:preview": "pnpm dlx git-cliff --offline --unreleased --strip header"
   },
   "peerDependencies": {
     "@apollo/server": ">=4.0.0",
