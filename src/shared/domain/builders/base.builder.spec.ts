@@ -22,9 +22,7 @@ describe('BaseBuilder', () => {
 
   describe('validate', () => {
     it('should throw when id is missing', () => {
-      builder
-        .withCreatedAt(new Date())
-        .withUpdatedAt(new Date());
+      builder.withCreatedAt(new Date()).withUpdatedAt(new Date());
 
       expect(() => builder.validate()).toThrow(FieldIsRequiredException);
       expect(() => builder.validate()).toThrow(/id/);
@@ -45,10 +43,7 @@ describe('BaseBuilder', () => {
     });
 
     it('should not throw when id, createdAt and updatedAt are set', () => {
-      builder
-        .withId('id')
-        .withCreatedAt(new Date())
-        .withUpdatedAt(new Date());
+      builder.withId('id').withCreatedAt(new Date()).withUpdatedAt(new Date());
 
       expect(() => builder.validate()).not.toThrow();
     });

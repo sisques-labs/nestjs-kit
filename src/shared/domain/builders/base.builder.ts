@@ -8,9 +8,10 @@ import { IBuilder } from '@/shared/domain/interfaces/builders/base-builder.inter
  * and default validation for those fields. Subclasses should override
  * {@link validate} to add entity-specific rules and call `super.validate()`.
  */
-export abstract class BaseBuilder<TAggregate, TViewModel>
-  implements IBuilder<TAggregate, TViewModel>
-{
+export abstract class BaseBuilder<TAggregate, TViewModel> implements IBuilder<
+  TAggregate,
+  TViewModel
+> {
   protected _id!: string;
   protected _createdAt!: Date;
   protected _updatedAt!: Date;
