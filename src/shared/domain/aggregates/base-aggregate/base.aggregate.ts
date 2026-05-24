@@ -28,4 +28,13 @@ export class BaseAggregate extends AggregateRoot {
   public get updatedAt(): DateValueObject {
     return this._updatedAt;
   }
+
+  /**
+   * Touch the aggregate.
+   *
+   * This method is used to update the updated at of the aggregate.
+   */
+  public touch(): void {
+    this._updatedAt = new DateValueObject(new Date());
+  }
 }
