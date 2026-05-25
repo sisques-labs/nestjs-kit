@@ -95,7 +95,9 @@ describe('BaseTypeOrmMapper', () => {
         updatedAt: updated,
       };
 
-      expect(mapper.toPersistence(aggregate)).toEqual(mapper.toEntity(aggregate));
+      expect(mapper.toPersistence(aggregate)).toEqual(
+        mapper.toEntity(aggregate),
+      );
     });
   });
 
