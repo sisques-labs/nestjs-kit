@@ -1,6 +1,13 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.10.1] - 2026-05-25
+
+### Bug Fixes
+- Format expectation in BaseTypeOrmMapper test for clarity (6b2cd73)
+
+### Features
+- Enhance database mappers and add new module exports (6fa29de)
 ## [0.10.0] - 2026-05-24
 
 ### Chore
