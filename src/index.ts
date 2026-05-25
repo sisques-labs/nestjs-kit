@@ -99,6 +99,7 @@ export * from './shared/domain/view-models/base-view-model/base-view-model';
 // ─── Infrastructure ───────────────────────────────────────────────────────────
 
 export * from './shared/infrastructure/database/base-database.repository';
+export * from './shared/infrastructure/database/mappers/base-database.mapper';
 
 // Logging (Winston config for nest-winston / winston.createLogger)
 export * from './shared/infrastructure/logging/factories/create-shared-winston-logger-options';
@@ -116,6 +117,7 @@ export * from './shared/infrastructure/database/mongodb/services/mongo.service';
 export * from './shared/infrastructure/database/typeorm/base-typeorm/base-typeorm-master/base-typeorm-master.repository';
 export * from './shared/infrastructure/database/typeorm/dtos/base-typeorm.dto';
 export * from './shared/infrastructure/database/typeorm/entities/base-typeorm.entity';
+export * from './shared/infrastructure/database/typeorm/mappers/base-typeorm.mapper';
 export * from './shared/infrastructure/database/typeorm/services/typeorm-master/typeorm-master.service';
 export * from './shared/infrastructure/database/typeorm/typeorm-module-options.factory';
 export * from './shared/infrastructure/database/typeorm/typeorm.module';
@@ -132,6 +134,7 @@ export * from './shared/infrastructure/kafka/schema-registry/schema-registry.ser
 
 // GraphQL - Enum registration (opt-in; call before schema generation)
 export * from './shared/transport/graphql/register-shared-graphql-enums';
+export * from './shared/transport/graphql/shared-graphql.module';
 
 // GraphQL - DTOs (Requests)
 export * from './shared/transport/graphql/dtos/requests/base-filter/base-filter.input';

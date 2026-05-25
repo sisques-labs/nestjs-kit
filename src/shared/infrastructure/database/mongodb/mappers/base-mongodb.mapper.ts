@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { BaseDatabaseMapper } from '@/shared/infrastructure/database/mappers/base-database.mapper';
 import { BaseMongoDto } from '@/shared/infrastructure/database/mongodb/dtos/base-mongo.dto';
 
 /**
@@ -18,7 +19,7 @@ export abstract class BaseMongoDBMapper<
   TViewModel,
   TMongoDto extends BaseMongoDto,
   TAggregate,
-> {
+> extends BaseDatabaseMapper<TAggregate, TMongoDto> {
   /**
    * Maps a MongoDB document DTO to a domain view model.
    *
@@ -52,12 +53,20 @@ export abstract class BaseMongoDBMapper<
   public abstract toAggregate(doc: TMongoDto): TAggregate;
 
   /**
+   * @inheritdoc
+   */
+  public toPersistence(aggregate: TAggregate): TMongoDto {
+    return this.fromAggregateToMongoData(aggregate);
+  }
+
+  /**
    * Normalizes values that may be a {@link Date} instance or a date string into a {@link Date} object.
    *
    * @param value - The value to normalize, either a {@link Date} or an ISO8601 string.
    * @returns The normalized {@link Date} object.
+   * @deprecated Use {@link normalizeDate} instead.
    */
   protected normalizeMongoDate(value: Date | string): Date {
-    return value instanceof Date ? value : new Date(value);
+    return this.normalizeDate(value);
   }
 }

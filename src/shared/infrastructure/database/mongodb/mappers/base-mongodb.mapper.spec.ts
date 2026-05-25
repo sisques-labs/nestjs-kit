@@ -148,6 +148,22 @@ describe('BaseMongoDBMapper', () => {
     });
   });
 
+  describe('toPersistence', () => {
+    it('delegates to fromAggregateToMongoData', () => {
+      const created = new Date('2024-01-01T00:00:00.000Z');
+      const updated = new Date('2024-01-02T00:00:00.000Z');
+      const aggregate = {
+        id: 'agg-3',
+        createdAt: created,
+        updatedAt: updated,
+      };
+
+      expect(mapper.toPersistence(aggregate)).toEqual(
+        mapper.fromAggregateToMongoData(aggregate),
+      );
+    });
+  });
+
   describe('round-trip', () => {
     it('document → view model → Mongo DTO preserves identity and dates', () => {
       const doc = driverDoc({ id: 'rt-1' });
