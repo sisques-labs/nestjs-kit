@@ -1,6 +1,13 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.10.2] - 2026-05-28
+
+### Features
+- Implement buildTypeOrmOrder method in BaseDatabaseRepository (1f7dbf0)
+
+### Refactor
+- Use SortDirection enum in BaseDatabaseRepository tests (67ed3bf)
 ## [0.10.1] - 2026-05-25
 
 ### Bug Fixes
