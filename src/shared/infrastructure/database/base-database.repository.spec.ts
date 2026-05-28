@@ -1,4 +1,5 @@
 import { Criteria } from '@/shared/domain/entities/criteria';
+import { SortDirection } from '@/shared/domain/enums/sort-direction.enum';
 
 import { BaseDatabaseRepository } from './base-database.repository';
 
@@ -72,8 +73,8 @@ describe('BaseDatabaseRepository', () => {
       const criteria = new Criteria(
         [],
         [
-          { field: 'createdAt', direction: 'DESC' },
-          { field: 'email', direction: 'ASC' },
+          { field: 'createdAt', direction: SortDirection.DESC },
+          { field: 'email', direction: SortDirection.ASC },
         ],
       );
 
