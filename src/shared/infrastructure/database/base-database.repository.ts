@@ -42,4 +42,22 @@ export class BaseDatabaseRepository {
     const skip = (page - 1) * limit;
     return { page, limit, skip };
   }
+
+  /**
+   * Builds a TypeORM order object from domain criteria sorts.
+   *
+   * @param criteria - The criteria containing sort definitions.
+   * @returns A TypeORM-compatible order object (e.g. { createdAt: 'DESC' }).
+   */
+  protected buildTypeOrmOrder(
+    criteria: Criteria,
+  ): Record<string, 'ASC' | 'DESC'> {
+    return criteria.sorts.reduce<Record<string, 'ASC' | 'DESC'>>(
+      (acc, sort) => ({
+        ...acc,
+        [sort.field]: sort.direction,
+      }),
+      {},
+    );
+  }
 }

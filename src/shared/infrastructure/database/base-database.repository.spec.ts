@@ -3,10 +3,16 @@ import { Criteria } from '@/shared/domain/entities/criteria';
 import { BaseDatabaseRepository } from './base-database.repository';
 
 describe('BaseDatabaseRepository', () => {
-  let repository: BaseDatabaseRepository;
+  class TestableBaseDatabaseRepository extends BaseDatabaseRepository {
+    public getTypeOrmOrder(criteria: Criteria): Record<string, 'ASC' | 'DESC'> {
+      return this.buildTypeOrmOrder(criteria);
+    }
+  }
+
+  let repository: TestableBaseDatabaseRepository;
 
   beforeEach(() => {
-    repository = new BaseDatabaseRepository();
+    repository = new TestableBaseDatabaseRepository();
   });
 
   describe('calculatePagination', () => {
@@ -58,6 +64,33 @@ describe('BaseDatabaseRepository', () => {
       expect(result.page).toBe(100);
       expect(result.limit).toBe(50);
       expect(result.skip).toBe(4950); // (100 - 1) * 50
+    });
+  });
+
+  describe('buildTypeOrmOrder', () => {
+    it('should build order object from criteria sorts', () => {
+      const criteria = new Criteria(
+        [],
+        [
+          { field: 'createdAt', direction: 'DESC' },
+          { field: 'email', direction: 'ASC' },
+        ],
+      );
+
+      const result = repository.getTypeOrmOrder(criteria);
+
+      expect(result).toEqual({
+        createdAt: 'DESC',
+        email: 'ASC',
+      });
+    });
+
+    it('should return empty order object when no sorts are provided', () => {
+      const criteria = new Criteria();
+
+      const result = repository.getTypeOrmOrder(criteria);
+
+      expect(result).toEqual({});
     });
   });
 });
