@@ -80,4 +80,31 @@ describe('BaseFilterInput', () => {
 
     expect(filter.operator).toBe(FilterOperator.NOT_EQUALS);
   });
+
+  it('should accept an array value (e.g. for the IN operator)', () => {
+    const filter = new BaseFilterInput();
+    filter.field = 'status';
+    filter.operator = FilterOperator.IN;
+    filter.value = ['ACTIVE', 'INACTIVE'];
+
+    expect(filter.value).toEqual(['ACTIVE', 'INACTIVE']);
+  });
+
+  it('should accept a number value', () => {
+    const filter = new BaseFilterInput();
+    filter.field = 'age';
+    filter.operator = FilterOperator.GREATER_THAN;
+    filter.value = 18;
+
+    expect(filter.value).toBe(18);
+  });
+
+  it('should accept a boolean value', () => {
+    const filter = new BaseFilterInput();
+    filter.field = 'isVerified';
+    filter.operator = FilterOperator.EQUALS;
+    filter.value = false;
+
+    expect(filter.value).toBe(false);
+  });
 });

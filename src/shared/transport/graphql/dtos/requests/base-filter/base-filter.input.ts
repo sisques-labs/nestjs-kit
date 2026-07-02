@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import GraphQLJSON from 'graphql-type-json';
 
 import { FilterOperator } from '@/shared/domain/enums/filter-operator.enum';
 
@@ -15,8 +16,13 @@ export class BaseFilterInput {
   @IsNotEmpty()
   operator: FilterOperator;
 
-  @Field(() => String, { description: 'The value to filter by' })
-  @IsString()
+  /**
+   * Arbitrary JSON so `IN` can carry an array and enum-backed fields can
+   * carry their real value type — validated per-field by
+   * {@link FilterValidationPipe} against a context's `FilterFieldRegistry`,
+   * not constrained here (this type is shared across every context).
+   */
+  @Field(() => GraphQLJSON, { description: 'The value to filter by' })
   @IsNotEmpty()
-  value: string;
+  value: unknown;
 }
