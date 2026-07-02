@@ -1,6 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.11.1] - 2026-07-02
+
+### Bug Fixes
+- **criteria:** Mark generated filter/sort input classes as abstract (b10f8ba)
 ## [0.11.0] - 2026-07-02
 
 ### Features
