@@ -1,6 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.11.0] - 2026-07-02
+
+### Features
+- **criteria:** Type-safe filter field enum and validated JSON value (232ceec)
 ## [0.10.2] - 2026-05-28
 
 ### Features
