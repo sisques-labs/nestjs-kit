@@ -57,6 +57,7 @@ export * from './shared/domain/exceptions/value-objects/invalid-uuid/invalid-uui
 export * from './shared/domain/interfaces/builders/base-builder.interface';
 export * from './shared/domain/interfaces/base-aggregate-dto.interface';
 export * from './shared/domain/interfaces/base-view-model-dto.interface';
+export * from './shared/domain/interfaces/criteria/filter-field-registry.interface';
 export * from './shared/domain/interfaces/event-metadata.interface';
 export * from './shared/domain/interfaces/events/base-event-data.interface';
 export * from './shared/domain/interfaces/factories/read-factory.interface';
@@ -138,9 +139,11 @@ export * from './shared/transport/graphql/shared-graphql.module';
 
 // GraphQL - DTOs (Requests)
 export * from './shared/transport/graphql/dtos/requests/base-filter/base-filter.input';
+export * from './shared/transport/graphql/dtos/requests/base-filter/create-filter-input.factory';
 export * from './shared/transport/graphql/dtos/requests/base-find-by-criteria/base-find-by-criteria.input';
 export * from './shared/transport/graphql/dtos/requests/base-pagination/base-pagination.input';
 export * from './shared/transport/graphql/dtos/requests/base-sort/base-sort.input';
+export * from './shared/transport/graphql/dtos/requests/base-sort/create-sort-input.factory';
 export * from './shared/transport/graphql/dtos/requests/numeric-range/numeric-range.input';
 
 // GraphQL - DTOs (Responses)
@@ -152,6 +155,9 @@ export * from './shared/transport/graphql/dtos/success-response-array.dto';
 // GraphQL - Mappers
 export * from './shared/transport/graphql/mappers/base-graphql.mapper';
 export * from './shared/transport/graphql/mappers/mutation-response/mutation-response.mapper';
+
+// GraphQL - Pipes
+export * from './shared/transport/graphql/pipes/filter-validation/filter-validation.pipe';
 
 // GraphQL - Plugins
 export * from './shared/transport/graphql/plugins/complexity.plugin';

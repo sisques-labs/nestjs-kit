@@ -660,6 +660,56 @@ export class UserResolver {
 
 Individual input types: `BaseFilterInput`, `BaseSortInput`, `BasePaginationInput`, `NumericRangeInput`.
 
+`BaseFilterInput.field` and `BaseSortInput.value` accept any `String`/`JSON` by
+default — fine for a quick resolver, but it means a client can filter on any
+field name and send any value. To restrict both per bounded context, use
+`createFilterInput`/`createSortInput` plus a `FilterFieldRegistry`:
+
+```typescript
+import {
+  createFilterInput,
+  createSortInput,
+  FilterFieldRegistry,
+  FilterValidationPipe,
+} from '@sisques-labs/nestjs-kit';
+import { registerEnumType } from '@nestjs/graphql';
+
+enum UserQueryableField {
+  EMAIL = 'email',
+  STATUS = 'status',
+  CREATED_AT = 'createdAt',
+}
+registerEnumType(UserQueryableField, { name: 'UserQueryableFieldEnum' });
+
+// field is now typed to UserQueryableFieldEnum instead of a free String
+export class UserFilterInput extends createFilterInput(UserQueryableField, 'User') {}
+export class UserSortInput extends createSortInput(UserQueryableField, 'User') {}
+
+// declares what `value` must look like per field, including enum membership
+const userFilterableFields: FilterFieldRegistry<UserQueryableField> = {
+  email: { type: 'string' },
+  status: { type: 'enum', enum: UserStatusEnum },
+  createdAt: { type: 'date' },
+};
+
+@Resolver()
+export class UserResolver {
+  @Query(() => UsersPaginatedResult)
+  users(
+    @Args('input', new FilterValidationPipe(userFilterableFields))
+    input: UserFindByCriteriaRequestDto,
+  ) {
+    return this.userService.findByCriteria(input);
+  }
+}
+```
+
+`FilterValidationPipe` throws `BadRequestException` for an unknown `field` or
+a `value` that doesn't match the registry entry (enum entries validate
+against `Object.values(enum)`, so the domain enum stays the single source of
+truth). It only reads `input.filters`, so it works the same way behind REST
+or MCP transports, not just GraphQL resolvers.
+
 ---
 
 ### Response DTOs
