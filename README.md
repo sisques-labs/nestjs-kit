@@ -672,7 +672,7 @@ import {
   FilterFieldRegistry,
   FilterValidationPipe,
 } from '@sisques-labs/nestjs-kit';
-import { registerEnumType } from '@nestjs/graphql';
+import { InputType, registerEnumType } from '@nestjs/graphql';
 
 enum UserQueryableField {
   EMAIL = 'email',
@@ -681,8 +681,14 @@ enum UserQueryableField {
 }
 registerEnumType(UserQueryableField, { name: 'UserQueryableFieldEnum' });
 
-// field is now typed to UserQueryableFieldEnum instead of a free String
+// field is now typed to UserQueryableFieldEnum instead of a free String.
+// createFilterInput/createSortInput register their returned class as
+// `{ isAbstract: true }` (same technique @nestjs/graphql's own PartialType/
+// PickType/OmitType use) — the subclass below MUST carry its own
+// @InputType(name) to actually register a concrete GraphQL type.
+@InputType('UserFilterInput')
 export class UserFilterInput extends createFilterInput(UserQueryableField, 'User') {}
+@InputType('UserSortInput')
 export class UserSortInput extends createSortInput(UserQueryableField, 'User') {}
 
 // declares what `value` must look like per field, including enum membership
