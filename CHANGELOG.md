@@ -1,6 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.11.2] - 2026-07-03
+
+### Features
+- **criteria:** Add applyCriteriaToQueryBuilder TypeORM helper (1412565)
 ## [0.11.1] - 2026-07-02
 
 ### Bug Fixes
