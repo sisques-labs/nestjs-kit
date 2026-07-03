@@ -610,6 +610,63 @@ type UserTypeormDto = BaseTypeormDto & {
 };
 ```
 
+#### Criteria → QueryBuilder
+
+`applyCriteriaToQueryBuilder` translates a `Criteria`'s `filters`/`sorts` into
+`WHERE`/`ORDER BY` clauses on a TypeORM `SelectQueryBuilder`, covering all 8
+`FilterOperator` values with index-scoped parameter names (`filter0`,
+`filter1`, ...) so the same field can appear more than once (e.g. a date
+range) without parameter collisions. It mutates and returns the same builder
+for chaining; pagination (`.skip()/.take()`) and any tenant-scoping `.where()`
+remain the caller's responsibility.
+
+```typescript
+import {
+  applyCriteriaToQueryBuilder,
+  BaseDatabaseRepository,
+  Criteria,
+  PaginatedResult,
+  SortDirection,
+} from '@sisques-labs/nestjs-kit';
+
+@Injectable()
+export class PlantTypeOrmReadRepository extends BaseDatabaseRepository {
+  async findByCriteria(criteria: Criteria): Promise<PaginatedResult<PlantViewModel>> {
+    const { page, limit, skip } = await this.calculatePagination(criteria);
+
+    const qb = this.repo
+      .createQueryBuilder('plant')
+      .where('plant.spaceId = :spaceId', { spaceId: this.spaceContext.require() });
+
+    applyCriteriaToQueryBuilder(qb, criteria, {
+      alias: 'plant',
+      defaultSort: { field: 'createdAt', direction: SortDirection.DESC },
+    });
+
+    const [entities, total] = await qb.skip(skip).take(limit).getManyAndCount();
+    const items = entities.map((e) => this.mapper.toViewModel(e));
+    return new PaginatedResult(items, total, page, limit);
+  }
+}
+```
+
+Use `onCustomFilter` for virtual/cross-column filters that don't map to a
+plain `column operator value` clause — return `true` to skip the standard
+switch for that filter:
+
+```typescript
+applyCriteriaToQueryBuilder(qb, criteria, {
+  alias: 'item',
+  onCustomFilter: (qb, filter) => {
+    if (filter.field !== 'low_stock') return false;
+    if (filter.value) {
+      qb.andWhere('item.lowStockThreshold IS NOT NULL AND item.quantity <= item.lowStockThreshold');
+    }
+    return true;
+  },
+});
+```
+
 ---
 
 ## Transport Layer (GraphQL)
