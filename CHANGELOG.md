@@ -1,3 +1,25 @@
+# [1.0.0](https://github.com/sisques-labs/nestjs-kit/compare/v0.11.2...v1.0.0) (2026-07-08)
+
+
+* feat(exports)!: split MongoDB/TypeORM/GraphQL/Kafka into subpath exports ([6015171](https://github.com/sisques-labs/nestjs-kit/commit/60151714f22a2f5b5671bd1a0db3dfaed38112a0))
+
+
+### Bug Fixes
+
+* **ci:** drop hardcoded pnpm version, rely on packageManager ([943ff40](https://github.com/sisques-labs/nestjs-kit/commit/943ff40f7a84fc91ab600f065a8d7510c679793b))
+* **ci:** pin packageManager so pnpm/action-setup can auto-detect ([b7e67a0](https://github.com/sisques-labs/nestjs-kit/commit/b7e67a01c8eedccbf80f0fc53409cdd1fde5a537))
+
+
+### BREAKING CHANGES
+
+* MongoDB, TypeORM, GraphQL, and Kafka symbols previously
+exported from the package root must now be imported from their matching
+subpath (see README's "Entry Points / Subpath Exports" section).
+
+Also automates releases: pushes to main now run semantic-release (via
+sisques-labs/workflows' node-release.yml) instead of a manual
+workflow_dispatch release, replacing the git-cliff based flow.
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -159,4 +181,3 @@ All notable changes to this project will be documented in this file.
 - Reorganize exports in index.ts for better structure and clarity (bcbd25f)
 - Expand documentation and implement composite value object handling in ValueObject base class (9529795)
 - Rename package from @sisques-labs/shared-nestjs to @sisques-labs/nestjs-kit and update related documentation for consistency (bbb11cf)
-
