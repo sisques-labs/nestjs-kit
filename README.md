@@ -6,10 +6,11 @@
 
 - [Publishing](#publishing)
   - [CI](#ci)
-  - [Release workflow](#release-workflow)
+  - [Release](#release)
   - [Publish from your machine](#publish-from-your-machine)
 - [Installation](#installation)
 - [Peer Dependencies](#peer-dependencies)
+  - [Entry Points / Subpath Exports](#entry-points--subpath-exports)
 - [Local development](#local-development)
 - [Module Setup](#module-setup)
 - [Domain Layer](#domain-layer)
@@ -40,39 +41,30 @@
 
 ## Publishing
 
-The package is published to the public npm registry as [`@sisques-labs/nestjs-kit`](https://www.npmjs.com/package/@sisques-labs/nestjs-kit) (see `publishConfig` in `package.json`). Releases are automated with GitHub Actions.
+The package is published to the public npm registry as [`@sisques-labs/nestjs-kit`](https://www.npmjs.com/package/@sisques-labs/nestjs-kit) (see `publishConfig` in `package.json`). Releases are fully automated with GitHub Actions — there is no manual release step.
 
 | Workflow | File | Trigger |
 |---|---|---|
-| **CI** | `.github/workflows/ci.yml` | Push and pull requests targeting `main` |
-| **Release** | `.github/workflows/release.yml` | Manual (`workflow_dispatch`) |
+| **CI** | `.github/workflows/ci.yml` (`ci` job) | Push and pull requests targeting `main` |
+| **Release** | `.github/workflows/ci.yml` (`release` job) | Push to `main`, after `ci` passes |
 
 ### CI
 
 Runs `pnpm install --frozen-lockfile`, **`pnpm lint`** (ESLint with `--fix`), **`pnpm build`**, and **`pnpm test`**.
 
-### Release workflow
+### Release
 
-Open **GitHub → Actions → Release → Run workflow** and choose:
+Every push to `main` that passes the `ci` job triggers the `release` job, which calls the shared [`node-release.yml`](https://github.com/sisques-labs/workflows/blob/main/.github/workflows/node-release.yml) reusable workflow from `sisques-labs/workflows`. That workflow runs [`semantic-release`](https://semantic-release.gitbook.io/) (config in `.releaserc.json`), which:
 
-| Input | Purpose |
-|---|---|
-| **version** | `patch`, `minor`, or `major` ([SemVer](https://semver.org)) |
-| **release_type** | `stable` (default dist-tag) or prerelease **`alpha`** / **`beta`** (separate dist-tags) |
+- Determines the version bump from [Conventional Commits](https://www.conventionalcommits.org/) since the last release (`fix:` → patch, `feat:` → minor, `!`/`BREAKING CHANGE:` → major).
+- Skips the release entirely if nothing since the last tag warrants one.
+- Updates `CHANGELOG.md`, publishes to npm with **`pnpm publish`** using the **`NPM_TOKEN`** repository secret, commits the version bump, tags the release (`vX.Y.Z`), and creates a GitHub Release with generated notes.
 
-The job then: runs lint and tests, bumps the version with `npm version`, builds, publishes with **`pnpm publish`** using the **`NPM_TOKEN`** repository secret, commits `package.json` / lockfile, creates a git tag, pushes to `main`, and creates a GitHub Release with generated notes.
-
-**Repository setup:** add an [npm automation token](https://docs.npmjs.com/creating-and-viewing-access-tokens) with publish rights as the **`NPM_TOKEN`** secret (GitHub → Settings → Secrets and variables → Actions).
+**Repository setup:** add an [npm automation token](https://docs.npmjs.com/creating-and-viewing-access-tokens) with publish rights as the **`NPM_TOKEN`** secret (GitHub → Settings → Secrets and variables → Actions). No manual `workflow_dispatch` step or version input is needed — just merge conventional-commit PRs into `main`.
 
 ### Publish from your machine
 
-```bash
-npm login
-pnpm build
-pnpm publish
-```
-
-The `prepublishOnly` script runs **`npm run build`** before publish so `dist/` is current.
+Not recommended — versioning and the changelog are owned by `semantic-release` based on commit history on `main`, so a manual `pnpm publish` will drift from the git tags. Merge conventional-commit PRs into `main` instead and let the `release` job publish.
 
 ---
 
@@ -93,7 +85,7 @@ If you previously used **`@sisques-labs/shared-nestjs`**, uninstall it and depen
 
 ## Peer Dependencies
 
-Install only what your app uses. Peers marked **optional** in `peerDependenciesMeta` can be omitted if you do not import that part of the library.
+Install only what your app uses. Peers marked **optional** in `peerDependenciesMeta` can be omitted if you do not import that part of the library — and thanks to the [subpath exports](#entry-points--subpath-exports) below, importing from the package root never pulls in code that requires them, so an unused optional peer is never even loaded, let alone required at install time.
 
 ```bash
 # Core NestJS (required for any integration)
@@ -102,14 +94,17 @@ pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs
 # CQRS (command handlers, EventBus)
 pnpm add @nestjs/cqrs
 
-# MongoDB module + repositories in this package
+# MongoDB module + repositories — only if you import '@sisques-labs/nestjs-kit/mongodb'
 pnpm add mongodb @nestjs/config
 
-# TypeORM module + repositories in this package
+# TypeORM module + repositories — only if you import '@sisques-labs/nestjs-kit/typeorm'
 pnpm add typeorm @nestjs/typeorm @nestjs/config
 
-# GraphQL DTOs, Apollo, complexity plugin
-pnpm add graphql @nestjs/graphql @nestjs/apollo @apollo/server graphql-query-complexity
+# GraphQL DTOs, Apollo, complexity plugin — only if you import '@sisques-labs/nestjs-kit/graphql'
+pnpm add graphql @nestjs/graphql @nestjs/apollo @apollo/server graphql-query-complexity graphql-type-json
+
+# Kafka event publishing / schema registry — only if you import '@sisques-labs/nestjs-kit/kafka'
+pnpm add @kafkajs/confluent-schema-registry @nestjs/axios
 
 # class-validator / class-transformer (typical for GraphQL inputs)
 pnpm add class-validator class-transformer
@@ -117,6 +112,21 @@ pnpm add class-validator class-transformer
 # Winston logging (shared config + nest-winston in your app)
 pnpm add nest-winston winston winston-daily-rotate-file
 ```
+
+### Entry Points / Subpath Exports
+
+The package has dedicated entry points so importing the root never requires an optional peer you don't use:
+
+| Import | Requires |
+|---|---|
+| `@sisques-labs/nestjs-kit` | Core only (`@nestjs/cqrs`, `class-validator`, `class-transformer`, `winston`, ...) — safe to import with nothing else installed |
+| `@sisques-labs/nestjs-kit/mongodb` | `mongodb`, `@nestjs/config` |
+| `@sisques-labs/nestjs-kit/typeorm` | `typeorm`, `@nestjs/typeorm`, `@nestjs/config` |
+| `@sisques-labs/nestjs-kit/graphql` | `graphql`, `@nestjs/graphql`, `@nestjs/apollo`, `@apollo/server`, `graphql-query-complexity`, `graphql-type-json` |
+| `@sisques-labs/nestjs-kit/kafka` | `@kafkajs/confluent-schema-registry`, `@nestjs/axios` |
+| `@sisques-labs/nestjs-kit/registered-enums` | Nothing extra — narrow export of the GraphQL enum registration for use before schema generation |
+
+> **Migrating from an earlier version?** MongoDB, TypeORM, GraphQL, and Kafka symbols used to be exported from the package root. Move those specific imports to the matching subpath above; everything else (value objects, base classes, domain enums, exceptions) still imports from `@sisques-labs/nestjs-kit` unchanged.
 
 ---
 
@@ -153,7 +163,8 @@ The library is **opt-in by feature**. Import **`MongoModule`**, **`TypeOrmModule
 ```typescript
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MongoModule, TypeOrmModule } from '@sisques-labs/nestjs-kit';
+import { MongoModule } from '@sisques-labs/nestjs-kit/mongodb';
+import { TypeOrmModule } from '@sisques-labs/nestjs-kit/typeorm';
 
 @Module({
   imports: [
@@ -477,12 +488,8 @@ Extend **`BaseMongoDatabaseRepository`** (do not only `implements IBaseReadRepos
 Published **`dist/**/*.d.ts`** use **relative** imports (rewritten at build with **`tsc-alias`**), so consumers do not need the kit’s `@/` path aliases to resolve inherited types.
 
 ```typescript
-import {
-  BaseMongoDatabaseRepository,
-  MongoService,
-  Criteria,
-  PaginatedResult,
-} from '@sisques-labs/nestjs-kit';
+import { BaseMongoDatabaseRepository, MongoService } from '@sisques-labs/nestjs-kit/mongodb';
+import { Criteria, PaginatedResult } from '@sisques-labs/nestjs-kit';
 
 @Injectable()
 export class UserMongoReadRepository extends BaseMongoDatabaseRepository {
@@ -532,7 +539,7 @@ export class UserMongoReadRepository extends BaseMongoDatabaseRepository {
 #### Base DTO
 
 ```typescript
-import { BaseMongoDto } from '@sisques-labs/nestjs-kit';
+import { BaseMongoDto } from '@sisques-labs/nestjs-kit/mongodb';
 
 // Type: { id: string; createdAt: Date; updatedAt: Date }
 type UserMongoDto = BaseMongoDto & {
@@ -565,7 +572,7 @@ Optional: `NODE_ENV` (affects query logging). For TypeORM CLI migrations that us
 #### Base Entity
 
 ```typescript
-import { BaseTypeormEntity } from '@sisques-labs/nestjs-kit';
+import { BaseTypeormEntity } from '@sisques-labs/nestjs-kit/typeorm';
 import { Entity, Column } from 'typeorm';
 
 @Entity('users')
@@ -583,7 +590,7 @@ export class UserTypeormEntity extends BaseTypeormEntity {
 import {
   BaseTypeormMasterRepository,
   TypeormMasterService,
-} from '@sisques-labs/nestjs-kit';
+} from '@sisques-labs/nestjs-kit/typeorm';
 
 @Injectable()
 export class UserTypeormRepository extends BaseTypeormMasterRepository {
@@ -602,7 +609,7 @@ export class UserTypeormRepository extends BaseTypeormMasterRepository {
 #### Base DTO
 
 ```typescript
-import { BaseTypeormDto } from '@sisques-labs/nestjs-kit';
+import { BaseTypeormDto } from '@sisques-labs/nestjs-kit/typeorm';
 
 // Type: { id: string; createdAt: Date; updatedAt: Date }
 type UserTypeormDto = BaseTypeormDto & {
@@ -621,8 +628,8 @@ for chaining; pagination (`.skip()/.take()`) and any tenant-scoping `.where()`
 remain the caller's responsibility.
 
 ```typescript
+import { applyCriteriaToQueryBuilder } from '@sisques-labs/nestjs-kit/typeorm';
 import {
-  applyCriteriaToQueryBuilder,
   BaseDatabaseRepository,
   Criteria,
   PaginatedResult,
@@ -674,7 +681,7 @@ applyCriteriaToQueryBuilder(qb, criteria, {
 If you use **`@nestjs/graphql`**, call **`registerSharedGraphqlEnums()`** once before schema generation (for example at the top of `main.ts` before `NestFactory.create`, or from a small module imported by `AppModule`). Add **`MutationResponseGraphQLMapper`** and **`ComplexityPlugin`** to your own GraphQL module’s **`providers`** when you use them—this package does **not** register them via **`SharedModule`**.
 
 ```typescript
-import { registerSharedGraphqlEnums } from '@sisques-labs/nestjs-kit';
+import { registerSharedGraphqlEnums } from '@sisques-labs/nestjs-kit/graphql';
 
 registerSharedGraphqlEnums();
 ```
@@ -704,7 +711,7 @@ query {
 ```
 
 ```typescript
-import { BaseFindByCriteriaInput } from '@sisques-labs/nestjs-kit';
+import { BaseFindByCriteriaInput } from '@sisques-labs/nestjs-kit/graphql';
 
 @Resolver()
 export class UserResolver {
@@ -728,7 +735,7 @@ import {
   createSortInput,
   FilterFieldRegistry,
   FilterValidationPipe,
-} from '@sisques-labs/nestjs-kit';
+} from '@sisques-labs/nestjs-kit/graphql';
 import { InputType, registerEnumType } from '@nestjs/graphql';
 
 enum UserQueryableField {
@@ -780,7 +787,7 @@ or MCP transports, not just GraphQL resolvers.
 #### `BasePaginatedResultDto`
 
 ```typescript
-import { BasePaginatedResultDto } from '@sisques-labs/nestjs-kit';
+import { BasePaginatedResultDto } from '@sisques-labs/nestjs-kit/graphql';
 import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
@@ -794,7 +801,7 @@ export class UsersPaginatedResult extends BasePaginatedResultDto {
 #### `MutationResponseDto`
 
 ```typescript
-import { MutationResponseDto } from '@sisques-labs/nestjs-kit';
+import { MutationResponseDto } from '@sisques-labs/nestjs-kit/graphql';
 
 // Shape: { success: boolean; message?: string; id?: string }
 
@@ -805,7 +812,7 @@ createUser(@Args('input') input: CreateUserInput): Promise<MutationResponseDto> 
 #### `MutationResponseArrayDto`
 
 ```typescript
-import { MutationResponseArrayDto } from '@sisques-labs/nestjs-kit';
+import { MutationResponseArrayDto } from '@sisques-labs/nestjs-kit/graphql';
 
 // Shape: { success: boolean; message?: string; ids: string[] }
 
@@ -820,7 +827,7 @@ deleteUsers(@Args('ids', { type: () => [String] }) ids: string[]): Promise<Mutat
 `MutationResponseGraphQLMapper` is a NestJS injectable that maps domain results to `MutationResponseDto`. Register it in the module that declares your resolvers (or a dedicated GraphQL module).
 
 ```typescript
-import { MutationResponseGraphQLMapper } from '@sisques-labs/nestjs-kit';
+import { MutationResponseGraphQLMapper } from '@sisques-labs/nestjs-kit/graphql';
 
 @Module({
   providers: [MutationResponseGraphQLMapper, UserResolver],
@@ -862,7 +869,7 @@ Register the plugin (for example next to your GraphQL module):
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { ComplexityPlugin } from '@sisques-labs/nestjs-kit';
+import { ComplexityPlugin } from '@sisques-labs/nestjs-kit/graphql';
 
 @Module({
   providers: [ComplexityPlugin],

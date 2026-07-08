@@ -107,58 +107,6 @@ export * from './shared/infrastructure/logging/factories/create-shared-winston-l
 export * from './shared/infrastructure/logging/formats/shared-winston.formats';
 export * from './shared/infrastructure/logging/interfaces/shared-winston-logger-factory-options.interface';
 
-// MongoDB
-export * from './shared/infrastructure/database/mongodb/base-mongo/base-mongo-database.repository';
-export * from './shared/infrastructure/database/mongodb/dtos/base-mongo.dto';
-export * from './shared/infrastructure/database/mongodb/mappers/base-mongodb.mapper';
-export * from './shared/infrastructure/database/mongodb/mongodb.module';
-export * from './shared/infrastructure/database/mongodb/services/mongo.service';
-
-// TypeORM
-export * from './shared/infrastructure/database/typeorm/base-typeorm/base-typeorm-master/base-typeorm-master.repository';
-export * from './shared/infrastructure/database/typeorm/criteria/apply-criteria-to-query-builder';
-export * from './shared/infrastructure/database/typeorm/dtos/base-typeorm.dto';
-export * from './shared/infrastructure/database/typeorm/entities/base-typeorm.entity';
-export * from './shared/infrastructure/database/typeorm/mappers/base-typeorm.mapper';
-export * from './shared/infrastructure/database/typeorm/services/typeorm-master/typeorm-master.service';
-export * from './shared/infrastructure/database/typeorm/typeorm-module-options.factory';
-export * from './shared/infrastructure/database/typeorm/typeorm.module';
-
-// Kafka
-export * from './shared/infrastructure/kafka/interfaces/kafka-event-publisher.interface';
-
-// Schema Registry
-export * from './shared/infrastructure/kafka/schema-registry/schema-registry-options.interface';
-export * from './shared/infrastructure/kafka/schema-registry/schema-registry.module';
-export * from './shared/infrastructure/kafka/schema-registry/schema-registry.service';
-
-// ─── Transport ────────────────────────────────────────────────────────────────
-
-// GraphQL - Enum registration (opt-in; call before schema generation)
-export * from './shared/transport/graphql/register-shared-graphql-enums';
-export * from './shared/transport/graphql/shared-graphql.module';
-
-// GraphQL - DTOs (Requests)
-export * from './shared/transport/graphql/dtos/requests/base-filter/base-filter.input';
-export * from './shared/transport/graphql/dtos/requests/base-filter/create-filter-input.factory';
-export * from './shared/transport/graphql/dtos/requests/base-find-by-criteria/base-find-by-criteria.input';
-export * from './shared/transport/graphql/dtos/requests/base-pagination/base-pagination.input';
-export * from './shared/transport/graphql/dtos/requests/base-sort/base-sort.input';
-export * from './shared/transport/graphql/dtos/requests/base-sort/create-sort-input.factory';
-export * from './shared/transport/graphql/dtos/requests/numeric-range/numeric-range.input';
-
-// GraphQL - DTOs (Responses)
-export * from './shared/transport/graphql/dtos/responses/base-paginated-result/base-paginated-result.dto';
-export * from './shared/transport/graphql/dtos/responses/numeric-range/numeric-range.dto';
-export * from './shared/transport/graphql/dtos/responses/success-response/success-response.dto';
-export * from './shared/transport/graphql/dtos/success-response-array.dto';
-
-// GraphQL - Mappers
-export * from './shared/transport/graphql/mappers/base-graphql.mapper';
-export * from './shared/transport/graphql/mappers/mutation-response/mutation-response.mapper';
-
-// GraphQL - Pipes
-export * from './shared/transport/graphql/pipes/filter-validation/filter-validation.pipe';
-
-// GraphQL - Plugins
-export * from './shared/transport/graphql/plugins/complexity.plugin';
+// MongoDB, TypeORM, Kafka, and GraphQL exports live in dedicated subpaths
+// so they don't pull in their optional peer dependencies from the root
+// import: '@sisques-labs/nestjs-kit/mongodb', '/typeorm', '/kafka', '/graphql'.
