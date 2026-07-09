@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.1.0...v1.1.1) (2026-07-09)
+
+
+### Bug Fixes
+
+* **mcp:** stop tsc-alias from rewriting the MCP SDK's paths alias ([509044c](https://github.com/sisques-labs/nestjs-kit/commit/509044c2273820eeaafa80f76e4594db7eecb942))
+
 # [1.1.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.0.0...v1.1.0) (2026-07-09)
 
 
