@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.1.1...v1.2.0) (2026-07-09)
+
+
+### Features
+
+* **metrics,messaging:** add shared modules under /metrics and /messaging ([4b991b8](https://github.com/sisques-labs/nestjs-kit/commit/4b991b8b4a2c0d67954337ebf67cef60d8c8aa44))
+
 ## [1.1.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.1.0...v1.1.1) (2026-07-09)
 
 
