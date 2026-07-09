@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.0.0...v1.1.0) (2026-07-09)
+
+
+### Features
+
+* **mcp:** add shared MCP module under /mcp subpath ([2322fe4](https://github.com/sisques-labs/nestjs-kit/commit/2322fe4b28ab746b05fc618bb6dc5e81bc556881))
+
 # [1.0.0](https://github.com/sisques-labs/nestjs-kit/compare/v0.11.2...v1.0.0) (2026-07-08)
 
 
