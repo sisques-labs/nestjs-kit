@@ -6,6 +6,6 @@
  * once a service has authentication/tenancy). Built by the app's own
  * `McpController` override or by wiring auth into `McpServerFactory.create()`.
  */
-export interface IMcpToolContext {
+export interface IBaseMcpToolContext {
   [key: string]: unknown;
 }

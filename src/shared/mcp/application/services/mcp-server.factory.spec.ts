@@ -2,11 +2,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { IMcpModuleOptions } from '../../mcp-module-options.interface';
 import { IMcpTool } from '../../domain/interfaces/mcp-tool.interface';
-import { IMcpToolContext } from '../../domain/interfaces/mcp-tool-context.interface';
+import { IBaseMcpToolContext } from '../../domain/interfaces/base-mcp-tool-context.interface';
 import { McpServerFactory } from './mcp-server.factory';
 import { McpToolRegistry } from './mcp-tool-registry.service';
 
-const CONTEXT: IMcpToolContext = { requestId: 'req-1' };
+const CONTEXT: IBaseMcpToolContext = { requestId: 'req-1' };
 const OPTIONS: IMcpModuleOptions = { name: 'test-service', version: '0.1.0' };
 
 describe('McpServerFactory', () => {
