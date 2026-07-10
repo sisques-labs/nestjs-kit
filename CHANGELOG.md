@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.2.0...v1.2.1) (2026-07-10)
+
+
+### Bug Fixes
+
+* **mcp:** rename IMcpToolContext to IBaseMcpToolContext ([#9](https://github.com/sisques-labs/nestjs-kit/issues/9)) ([2a44744](https://github.com/sisques-labs/nestjs-kit/commit/2a44744e753b07ea7b9444e781e9e568bf23f2bd))
+
 # [1.2.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.1.1...v1.2.0) (2026-07-09)
 
 
