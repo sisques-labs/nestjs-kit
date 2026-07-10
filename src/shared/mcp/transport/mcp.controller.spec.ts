@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { IMcpContextBuilder } from '../domain/interfaces/mcp-context-builder.interface';
-import { IMcpToolContext } from '../domain/interfaces/mcp-tool-context.interface';
+import { IBaseMcpToolContext } from '../domain/interfaces/base-mcp-tool-context.interface';
 import { McpServerFactory } from '../application/services/mcp-server.factory';
 import { McpController } from './mcp.controller';
 
@@ -21,7 +21,7 @@ describe('McpController', () => {
   let factory: jest.Mocked<McpServerFactory>;
   let contextBuilder: jest.Mocked<IMcpContextBuilder>;
   let server: { connect: jest.Mock; close: jest.Mock };
-  const CONTEXT: IMcpToolContext = { requestId: 'req-1' };
+  const CONTEXT: IBaseMcpToolContext = { requestId: 'req-1' };
 
   beforeEach(() => {
     jest.clearAllMocks();

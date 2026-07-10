@@ -1,7 +1,7 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { ZodRawShape } from 'zod';
 
-import { IMcpToolContext } from './mcp-tool-context.interface';
+import { IBaseMcpToolContext } from './base-mcp-tool-context.interface';
 
 /**
  * Contract every MCP tool implements.
@@ -13,9 +13,11 @@ import { IMcpToolContext } from './mcp-tool-context.interface';
  *
  * `TContext` is the app's own request context shape (see
  * `IMcpContextBuilder`) — a service with no auth can use the default
- * `IMcpToolContext` (`{ requestId }`); a service with auth/tenancy extends it.
+ * `IBaseMcpToolContext` (`{ requestId }`); a service with auth/tenancy extends it.
  */
-export interface IMcpTool<TContext extends IMcpToolContext = IMcpToolContext> {
+export interface IMcpTool<
+  TContext extends IBaseMcpToolContext = IBaseMcpToolContext,
+> {
   /** Unique tool name exposed to clients (snake_case, e.g. `order_find_by_id`). */
   readonly name: string;
   /** Optional human-friendly title shown by MCP clients. */

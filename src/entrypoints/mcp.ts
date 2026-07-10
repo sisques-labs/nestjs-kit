@@ -7,7 +7,7 @@
 export * from '../shared/mcp/domain/constants/mcp-tool.constants';
 export * from '../shared/mcp/domain/decorators/mcp-tool.decorator';
 export * from '../shared/mcp/domain/interfaces/mcp-context-builder.interface';
-export * from '../shared/mcp/domain/interfaces/mcp-tool-context.interface';
+export * from '../shared/mcp/domain/interfaces/base-mcp-tool-context.interface';
 export * from '../shared/mcp/domain/interfaces/mcp-tool.interface';
 
 export * from '../shared/mcp/application/services/default-mcp-context-builder.service';
