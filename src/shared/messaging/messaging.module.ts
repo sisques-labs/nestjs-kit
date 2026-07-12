@@ -30,6 +30,15 @@ import { IMessagingModuleOptions } from './messaging-module-options.interface';
  * to its own CommandBus/QueryBus — this package has no opinion on inbound
  * envelope shape or routing (see `IEventConsumer`).
  *
+ * Registered as a **global** module (like `ConfigModule.forRoot({ isGlobal:
+ * true })` elsewhere in a consuming app): call `forRoot()` once, typically
+ * from the app's core/shared module, and `EVENT_PUBLISHER`/`EVENT_CONSUMER`
+ * become injectable from any module in the app — no other module needs to
+ * `imports: [MessagingModule]` itself. This matters in particular for
+ * `EVENT_CONSUMER`: unlike the publisher (only `DomainEventForwarderService`,
+ * declared in this same module, ever needs it), the consumer is meant to be
+ * injected directly by feature modules elsewhere in the app.
+ *
  * @example
  * ```ts
  * MessagingModule.forRoot({ aggregateModuleMap: AGGREGATE_MODULE_MAP })
@@ -40,6 +49,7 @@ export class MessagingModule {
   static forRoot(options: IMessagingModuleOptions): DynamicModule {
     return {
       module: MessagingModule,
+      global: true,
       imports: [CqrsModule],
       providers: [
         { provide: AGGREGATE_MODULE_MAP, useValue: options.aggregateModuleMap },
@@ -48,6 +58,7 @@ export class MessagingModule {
         { provide: EVENT_PUBLISHER, useClass: KafkajsEventPublisherAdapter },
         { provide: EVENT_CONSUMER, useClass: KafkajsEventConsumerAdapter },
       ],
+      exports: [EVENT_PUBLISHER, EVENT_CONSUMER],
     };
   }
 }
