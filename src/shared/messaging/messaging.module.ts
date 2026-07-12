@@ -3,8 +3,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { DomainEventForwarderService } from './application/services/domain-event-forwarder.service';
 import { AGGREGATE_MODULE_MAP } from './domain/constants/messaging.constants';
+import { EVENT_CONSUMER } from './domain/ports/event-consumer.port';
 import { EVENT_PUBLISHER } from './domain/ports/event-publisher.port';
 import { EventRoutingService } from './domain/routing/event-routing.service';
+import { KafkajsEventConsumerAdapter } from './infrastructure/kafka/kafkajs-event-consumer.adapter';
 import { KafkajsEventPublisherAdapter } from './infrastructure/kafka/kafkajs-event-publisher.adapter';
 import { IMessagingModuleOptions } from './messaging-module-options.interface';
 
@@ -22,6 +24,12 @@ import { IMessagingModuleOptions } from './messaging-module-options.interface';
  * shaped like `IKafkaConfig` (via `ConfigModule.forRoot({ load: [...] })`) —
  * see `infrastructure/kafka/kafka-config.interface.ts`.
  *
+ * Also registers `EVENT_CONSUMER` (`KafkajsEventConsumerAdapter`), the inbound
+ * counterpart: the consuming app injects it directly and calls `run(groupId,
+ * topics, handler)` from its own bootstrap service to subscribe and dispatch
+ * to its own CommandBus/QueryBus — this package has no opinion on inbound
+ * envelope shape or routing (see `IEventConsumer`).
+ *
  * @example
  * ```ts
  * MessagingModule.forRoot({ aggregateModuleMap: AGGREGATE_MODULE_MAP })
@@ -38,6 +46,7 @@ export class MessagingModule {
         EventRoutingService,
         DomainEventForwarderService,
         { provide: EVENT_PUBLISHER, useClass: KafkajsEventPublisherAdapter },
+        { provide: EVENT_CONSUMER, useClass: KafkajsEventConsumerAdapter },
       ],
     };
   }
