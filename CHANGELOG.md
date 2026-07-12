@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.2.1...v1.3.0) (2026-07-12)
+
+
+### Features
+
+* **messaging:** add Kafka consumer port and kafkajs adapter ([145425b](https://github.com/sisques-labs/nestjs-kit/commit/145425b43367cbf3f3d8345b692e22e53d3d7728))
+
 ## [1.2.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.2.0...v1.2.1) (2026-07-10)
 
 
