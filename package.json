@@ -165,7 +165,7 @@
   },
   "devDependencies": {
     "@apollo/server": "^4.0.0",
-    "@kafkajs/confluent-schema-registry": "^3.9.0",
+    "@kafkajs/confluent-schema-registry": "^4.1.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
