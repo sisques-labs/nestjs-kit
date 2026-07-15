@@ -19,11 +19,3 @@ updates:
       interval: cron
       cronjob: "0 9 1,15 * *"
       timezone: UTC
-
-  - package-ecosystem: docker
-    directory: /
-    target-branch: dependabot/updates
-    schedule:
-      interval: cron
-      cronjob: "0 9 1,15 * *"
-      timezone: UTC
