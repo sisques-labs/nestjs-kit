@@ -1,6 +1,7 @@
 import { Test, type TestingModule } from '@nestjs/testing';
 
 import type { MutationResponseDto } from '@/shared/transport/graphql/dtos/responses/success-response/success-response.dto';
+import type { MutationResponseArrayDto } from '@/shared/transport/graphql/dtos/success-response-array.dto';
 
 import { MutationResponseGraphQLMapper } from './mutation-response.mapper';
 
@@ -112,6 +113,21 @@ describe('MutationResponseGraphQLMapper', () => {
 
       expect(result).not.toBe(props);
       expect(result).toEqual(props);
+    });
+  });
+
+  describe('toResponseDtoArray', () => {
+    it('should map an array mutation response', () => {
+      const props: MutationResponseArrayDto = {
+        success: true,
+        message: 'Entities created',
+        ids: ['id-1', 'id-2'],
+      };
+
+      const result = mapper.toResponseDtoArray(props);
+
+      expect(result).toEqual(props);
+      expect(result).not.toBe(props);
     });
   });
 });

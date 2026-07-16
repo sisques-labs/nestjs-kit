@@ -53,6 +53,71 @@ describe('BooleanValueObject', () => {
       expect(new BooleanValueObject('enabled').value).toBe(true);
       expect(new BooleanValueObject('disabled').value).toBe(false);
     });
+
+    it('should parse "true"/"false" strings in strict mode', () => {
+      expect(new BooleanValueObject('TRUE', { strictMode: true }).value).toBe(
+        true,
+      );
+      expect(new BooleanValueObject('false', { strictMode: true }).value).toBe(
+        false,
+      );
+    });
+
+    it('should throw for an unrecognized flexible string', () => {
+      expect(() => new BooleanValueObject('maybe')).toThrow(
+        InvalidBooleanException,
+      );
+    });
+
+    it('should parse 1/0 numbers in strict mode', () => {
+      expect(new BooleanValueObject(1, { strictMode: true }).value).toBe(true);
+      expect(new BooleanValueObject(0, { strictMode: true }).value).toBe(false);
+    });
+
+    it('should throw for an invalid number in strict mode', () => {
+      expect(() => new BooleanValueObject(2, { strictMode: true })).toThrow(
+        InvalidBooleanException,
+      );
+    });
+
+    it('should treat any positive number as true in flexible mode', () => {
+      expect(new BooleanValueObject(42).value).toBe(true);
+    });
+
+    it('should throw for a negative number in flexible mode', () => {
+      expect(() => new BooleanValueObject(-5)).toThrow(InvalidBooleanException);
+    });
+
+    it('should accept null when allowNull is true', () => {
+      expect(
+        new BooleanValueObject(null as any, { allowNull: true }).value,
+      ).toBe(false);
+    });
+
+    it('should accept undefined when allowUndefined is true', () => {
+      expect(
+        new BooleanValueObject(undefined as any, { allowUndefined: true })
+          .value,
+      ).toBe(false);
+    });
+
+    it('should throw for null when allowNull is not set', () => {
+      expect(() => new BooleanValueObject(null as any)).toThrow(
+        InvalidBooleanException,
+      );
+    });
+
+    it('should throw for undefined when allowUndefined is not set', () => {
+      expect(() => new BooleanValueObject(undefined as any)).toThrow(
+        InvalidBooleanException,
+      );
+    });
+
+    it('should throw for an unsupported value type', () => {
+      expect(() => new BooleanValueObject({} as any)).toThrow(
+        InvalidBooleanException,
+      );
+    });
   });
 
   describe('equals', () => {

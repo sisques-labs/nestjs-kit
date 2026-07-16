@@ -34,6 +34,13 @@ describe('SlugValueObject', () => {
         InvalidStringException,
       );
     });
+
+    it('should create a slug from string via fromString static factory', () => {
+      const slug = SlugValueObject.fromString('Hello World');
+
+      expect(slug).toBeInstanceOf(SlugValueObject);
+      expect(slug.value).toBe('hello-world');
+    });
   });
 
   describe('equals', () => {
@@ -81,6 +88,86 @@ describe('SlugValueObject', () => {
       const newSlug = slug.addPrefix('prefix');
 
       expect(newSlug.value).toBe('prefix-test-slug');
+    });
+
+    it('should return an empty string for non-string or falsy input to generateSlug', () => {
+      expect(SlugValueObject.generateSlug('')).toBe('');
+      expect(SlugValueObject.generateSlug(undefined as any)).toBe('');
+      expect(SlugValueObject.generateSlug(123 as any)).toBe('');
+    });
+
+    it('should strip non-alphanumeric characters and collapse hyphens', () => {
+      expect(SlugValueObject.generateSlug('  Foo___Bar!! --- Baz  ')).toBe(
+        'foo-bar-baz',
+      );
+    });
+
+    it('should detect empty or hyphen-only slugs', () => {
+      class ExposedSlug extends SlugValueObject {
+        public checkEmptyOrOnlyHyphens(value: string): boolean {
+          Object.defineProperty(this, 'value', { value, configurable: true });
+          return this.isEmptyOrOnlyHyphens();
+        }
+      }
+
+      const slug = new ExposedSlug('placeholder', { minLength: 0 });
+      expect(slug.checkEmptyOrOnlyHyphens('')).toBe(true);
+      expect(slug.checkEmptyOrOnlyHyphens('---')).toBe(true);
+      expect(slug.checkEmptyOrOnlyHyphens('abc')).toBe(false);
+    });
+
+    it('should return zero word count for an empty slug value', () => {
+      class ExposedSlug extends SlugValueObject {
+        public wordCountOf(value: string): number {
+          Object.defineProperty(this, 'value', {
+            value,
+            configurable: true,
+          });
+          return this.getWordCount();
+        }
+      }
+
+      const slug = new ExposedSlug('placeholder', { minLength: 0 });
+      expect(slug.wordCountOf('')).toBe(0);
+    });
+
+    it('should convert the slug to human-readable title case', () => {
+      const slug = new SlugValueObject('hello-world-test');
+
+      const humanReadable = slug.toHumanReadable();
+
+      expect(humanReadable.value).toBe('Hello World Test');
+    });
+
+    it('should return the same instance when adding an empty-generating suffix', () => {
+      const slug = new SlugValueObject('test-slug');
+
+      expect(slug.addSuffix('!!!')).toBe(slug);
+    });
+
+    it('should return the same instance when adding an empty-generating prefix', () => {
+      const slug = new SlugValueObject('test-slug');
+
+      expect(slug.addPrefix('!!!')).toBe(slug);
+    });
+
+    it('should expose validateSlug for direct invocation by subclasses', () => {
+      class ExposedSlug extends SlugValueObject {
+        public runValidateSlugWith(value: string): void {
+          Object.defineProperty(this, 'value', { value, configurable: true });
+          (this as any).validateSlug();
+        }
+      }
+
+      const slug = new ExposedSlug('valid-slug');
+
+      expect(() => slug.runValidateSlugWith('valid-slug')).not.toThrow();
+      expect(() => slug.runValidateSlugWith('---')).toThrow(
+        InvalidStringException,
+      );
+      expect(() => slug.runValidateSlugWith('Invalid Slug!')).toThrow(
+        InvalidStringException,
+      );
     });
   });
 });

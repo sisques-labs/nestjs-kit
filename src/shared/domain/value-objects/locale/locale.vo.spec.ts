@@ -31,6 +31,37 @@ describe('LocaleValueObject', () => {
     it('should throw InvalidLocaleException for locale not in common list', () => {
       expect(() => new LocaleValueObject('xx')).toThrow(InvalidLocaleException);
     });
+
+    it('should skip existence validation when validateExistence is false', () => {
+      expect(
+        () => new LocaleValueObject('xx', { validateExistence: false }),
+      ).not.toThrow();
+    });
+
+    it('should skip existence validation for an empty value when allowEmpty is true', () => {
+      const locale = new LocaleValueObject('', { allowEmpty: true });
+
+      expect(locale.value).toBe('');
+    });
+
+    it('should create a locale via the fromString static factory', () => {
+      const locale = LocaleValueObject.fromString('en');
+
+      expect(locale).toBeInstanceOf(LocaleValueObject);
+      expect(locale.value).toBe('en');
+    });
+  });
+
+  describe('normalizeLocale', () => {
+    it('should return an empty string for falsy or non-string input', () => {
+      expect(LocaleValueObject.normalizeLocale('')).toBe('');
+      expect(LocaleValueObject.normalizeLocale(undefined as any)).toBe('');
+      expect(LocaleValueObject.normalizeLocale(123 as any)).toBe('');
+    });
+
+    it('should trim and lowercase the locale', () => {
+      expect(LocaleValueObject.normalizeLocale('  EN  ')).toBe('en');
+    });
   });
 
   describe('equals', () => {
@@ -100,6 +131,64 @@ describe('LocaleValueObject', () => {
       });
 
       expect(locale.getDisplayName()).toBe('English');
+    });
+
+    it('should return null display name for an unknown locale', () => {
+      const locale = new LocaleValueObject('xx', {
+        validateExistence: false,
+      });
+
+      expect(locale.getDisplayName()).toBeNull();
+    });
+
+    it('should check existence in the common locales list', () => {
+      expect(
+        new LocaleValueObject('en', { validateExistence: false }).exists(),
+      ).toBe(true);
+      expect(
+        new LocaleValueObject('xx', { validateExistence: false }).exists(),
+      ).toBe(false);
+    });
+
+    it('should check if the format is valid', () => {
+      expect(
+        new LocaleValueObject('en', {
+          validateExistence: false,
+        }).isValidFormat(),
+      ).toBe(true);
+    });
+
+    it('should check if locale is Spanish, French or German', () => {
+      expect(new LocaleValueObject('es').isSpanish()).toBe(true);
+      expect(new LocaleValueObject('en').isSpanish()).toBe(false);
+      expect(new LocaleValueObject('fr').isFrench()).toBe(true);
+      expect(new LocaleValueObject('en').isFrench()).toBe(false);
+      expect(new LocaleValueObject('de').isGerman()).toBe(true);
+      expect(new LocaleValueObject('en').isGerman()).toBe(false);
+    });
+
+    it('should get country code and mark hasCountryCode when a compound value is present', () => {
+      class ExposedLocale extends LocaleValueObject {
+        public withRawValue(value: string): this {
+          Object.defineProperty(this, 'value', { value, configurable: true });
+          return this;
+        }
+      }
+
+      const locale = new ExposedLocale('en', {
+        validateExistence: false,
+      }).withRawValue('en-us');
+
+      expect(locale.hasCountryCode()).toBe(true);
+      expect(locale.getCountryCode()).toBe('US');
+    });
+
+    it('should return null country code when there is no country part', () => {
+      const locale = new LocaleValueObject('en', {
+        validateExistence: false,
+      });
+
+      expect(locale.getCountryCode()).toBeNull();
     });
   });
 });

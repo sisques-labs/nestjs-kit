@@ -15,6 +15,15 @@ describe('StringValueObject', () => {
       expect(str.value).toBe('test');
     });
 
+    it('should default to an empty string for null or undefined input', () => {
+      expect(
+        new StringValueObject(null as any, { allowEmpty: true }).value,
+      ).toBe('');
+      expect(
+        new StringValueObject(undefined as any, { allowEmpty: true }).value,
+      ).toBe('');
+    });
+
     it('should not trim when trim option is false', () => {
       const str = new StringValueObject('  test  ', { trim: false });
 
@@ -91,6 +100,14 @@ describe('StringValueObject', () => {
       expect(str.contains('xyz')).toBe(false);
     });
 
+    it('should check contains case-insensitively when caseSensitive is false', () => {
+      const str = new StringValueObject('Hello World', {
+        caseSensitive: false,
+      });
+
+      expect(str.contains('WORLD')).toBe(true);
+    });
+
     it('should check if string starts with prefix', () => {
       const str = new StringValueObject('hello world');
 
@@ -98,11 +115,27 @@ describe('StringValueObject', () => {
       expect(str.startsWith('world')).toBe(false);
     });
 
+    it('should check startsWith case-insensitively when caseSensitive is false', () => {
+      const str = new StringValueObject('Hello World', {
+        caseSensitive: false,
+      });
+
+      expect(str.startsWith('HELLO')).toBe(true);
+    });
+
     it('should check if string ends with suffix', () => {
       const str = new StringValueObject('hello world');
 
       expect(str.endsWith('world')).toBe(true);
       expect(str.endsWith('hello')).toBe(false);
+    });
+
+    it('should check endsWith case-insensitively when caseSensitive is false', () => {
+      const str = new StringValueObject('Hello World', {
+        caseSensitive: false,
+      });
+
+      expect(str.endsWith('WORLD')).toBe(true);
     });
 
     it('should convert to lowercase', () => {
@@ -126,11 +159,33 @@ describe('StringValueObject', () => {
       expect(capitalized.value).toBe('Test');
     });
 
+    it('should return an empty string unchanged when capitalizing', () => {
+      const str = new StringValueObject('', { allowEmpty: true });
+      const capitalized = str.capitalize();
+
+      expect(capitalized.value).toBe('');
+    });
+
+    it('should trim whitespace via trim()', () => {
+      const str = new StringValueObject('  hello  ', { trim: false });
+
+      expect(str.trim().value).toBe('hello');
+    });
+
     it('should replace substring', () => {
       const str = new StringValueObject('hello world');
       const replaced = str.replace('world', 'universe');
 
       expect(replaced.value).toBe('hello universe');
+    });
+
+    it('should replace substring case-insensitively when caseSensitive is false', () => {
+      const str = new StringValueObject('Hello World', {
+        caseSensitive: false,
+      });
+      const replaced = str.replace('WORLD', 'universe');
+
+      expect(replaced.value).toBe('Hello universe');
     });
 
     it('should split string', () => {
