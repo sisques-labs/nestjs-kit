@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.4.0...v1.4.1) (2026-07-16)
+
+
+### Bug Fixes
+
+* **deps:** move @nestjs/cqrs to peerDependencies ([712f742](https://github.com/sisques-labs/nestjs-kit/commit/712f742cc6810c0b52460a602064d42daf73f32c))
+
 # [1.4.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.3.2...v1.4.0) (2026-07-16)
 
 
