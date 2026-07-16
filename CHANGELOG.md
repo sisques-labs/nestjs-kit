@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.3.2...v1.4.0) (2026-07-16)
+
+
+### Features
+
+* **value-objects:** add MimeTypeValueObject and FilenameValueObject ([317e78c](https://github.com/sisques-labs/nestjs-kit/commit/317e78c2325219791e91d6e5b3d8e8e17ba4fcb4))
+
 ## [1.3.2](https://github.com/sisques-labs/nestjs-kit/compare/v1.3.1...v1.3.2) (2026-07-15)
 
 
