@@ -20,6 +20,36 @@ describe('TimezoneValueObject', () => {
         InvalidTimezoneException,
       );
     });
+
+    it('should skip existence validation when validateExistence is false', () => {
+      expect(
+        () =>
+          new TimezoneValueObject('Invalid/Timezone', {
+            validateExistence: false,
+          }),
+      ).not.toThrow();
+    });
+
+    it('should skip existence validation for an empty value when allowEmpty is true', () => {
+      const timezone = new TimezoneValueObject('', { allowEmpty: true });
+
+      expect(timezone.value).toBe('');
+    });
+
+    it('should create a timezone via the fromString static factory', () => {
+      const timezone = TimezoneValueObject.fromString('UTC');
+
+      expect(timezone).toBeInstanceOf(TimezoneValueObject);
+      expect(timezone.value).toBe('UTC');
+    });
+  });
+
+  describe('normalizeTimezone', () => {
+    it('should return an empty string for falsy or non-string input', () => {
+      expect(TimezoneValueObject.normalizeTimezone('')).toBe('');
+      expect(TimezoneValueObject.normalizeTimezone(undefined as any)).toBe('');
+      expect(TimezoneValueObject.normalizeTimezone(123 as any)).toBe('');
+    });
   });
 
   describe('equals', () => {
@@ -60,6 +90,30 @@ describe('TimezoneValueObject', () => {
       expect(new TimezoneValueObject('America/New_York').isEuropean()).toBe(
         false,
       );
+    });
+
+    it('should check if timezone is American', () => {
+      expect(new TimezoneValueObject('America/New_York').isAmerican()).toBe(
+        true,
+      );
+      expect(new TimezoneValueObject('Europe/Madrid').isAmerican()).toBe(false);
+    });
+
+    it('should check if timezone is Asian', () => {
+      expect(new TimezoneValueObject('Asia/Tokyo').isAsian()).toBe(true);
+      expect(new TimezoneValueObject('Europe/Madrid').isAsian()).toBe(false);
+    });
+
+    it('should check if timezone is UTC', () => {
+      expect(new TimezoneValueObject('UTC').isUTC()).toBe(true);
+      expect(new TimezoneValueObject('Europe/Madrid').isUTC()).toBe(false);
+    });
+
+    it('should return null region and city for a timezone without a region separator', () => {
+      const timezone = new TimezoneValueObject('UTC');
+
+      expect(timezone.getRegion()).toBeNull();
+      expect(timezone.getCity()).toBeNull();
     });
   });
 });

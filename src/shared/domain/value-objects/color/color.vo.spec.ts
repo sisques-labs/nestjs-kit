@@ -37,6 +37,15 @@ describe('ColorValueObject', () => {
       expect(() => new ColorValueObject('')).toThrow(InvalidColorException);
     });
 
+    it('should throw InvalidColorException for null or undefined value', () => {
+      expect(() => new ColorValueObject(null as any)).toThrow(
+        InvalidColorException,
+      );
+      expect(() => new ColorValueObject(undefined as any)).toThrow(
+        InvalidColorException,
+      );
+    });
+
     it('should throw InvalidColorException for invalid color format', () => {
       expect(() => new ColorValueObject('invalid')).toThrow(
         InvalidColorException,
@@ -94,6 +103,80 @@ describe('ColorValueObject', () => {
       const color = new ColorValueObject('#ffffff');
 
       expect(color.toRgb()).toBeDefined();
+    });
+
+    it('should return the RGB value unchanged when already RGB', () => {
+      expect(new ColorValueObject('rgb(255, 255, 255)').toRgb()).toBe(
+        'rgb(255, 255, 255)',
+      );
+    });
+
+    it('should compute the exact RGB values from hex', () => {
+      expect(new ColorValueObject('#ff00ff').toRgb()).toBe('rgb(255, 0, 255)');
+      expect(new ColorValueObject('#000000').toRgb()).toBe('rgb(0, 0, 0)');
+    });
+
+    it('should compute the exact hex value from RGB', () => {
+      expect(new ColorValueObject('rgb(255, 0, 255)').toHex()).toBe('#ff00ff');
+      expect(new ColorValueObject('rgb(0, 0, 0)').toHex()).toBe('#000000');
+    });
+
+    it('should fall back to the original value when RGB cannot be parsed for hex conversion', () => {
+      const color = new ColorValueObject('rgb( 255, 255, 255)');
+
+      expect(color.isRgb()).toBe(true);
+      expect(color.toHex()).toBe('rgb( 255, 255, 255)');
+    });
+
+    it('should return the value unchanged for hsl-to-hex and hsl-to-rgb stubs', () => {
+      const color = new ColorValueObject('hsl(0, 0%, 100%)');
+
+      expect(color.toHex()).toBe('hsl(0, 0%, 100%)');
+      expect(color.toRgb()).toBe('hsl(0, 0%, 100%)');
+    });
+
+    it('should return the value unchanged for hex-to-hsl and rgb-to-hsl stubs', () => {
+      expect(new ColorValueObject('#ffffff').toHsl()).toBe('#ffffff');
+      expect(new ColorValueObject('rgb(255, 255, 255)').toHsl()).toBe(
+        'rgb(255, 255, 255)',
+      );
+    });
+
+    it('should return the HSL value unchanged when already HSL', () => {
+      expect(new ColorValueObject('hsl(0, 0%, 100%)').toHsl()).toBe(
+        'hsl(0, 0%, 100%)',
+      );
+    });
+
+    it('should return a named color unchanged from all conversion methods', () => {
+      const color = new ColorValueObject('red');
+
+      expect(color.toHex()).toBe('red');
+      expect(color.toRgb()).toBe('red');
+      expect(color.toHsl()).toBe('red');
+    });
+
+    it('should accept all supported named colors', () => {
+      const namedColors = [
+        'red',
+        'green',
+        'blue',
+        'yellow',
+        'orange',
+        'purple',
+        'pink',
+        'black',
+        'white',
+        'gray',
+        'grey',
+        'brown',
+        'cyan',
+        'magenta',
+      ];
+
+      namedColors.forEach((name) => {
+        expect(() => new ColorValueObject(name)).not.toThrow();
+      });
     });
   });
 });
