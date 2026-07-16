@@ -248,6 +248,8 @@ All value objects are immutable and validate their input on construction, throwi
 | `LengthUnitValueObject` | Unit of length measurement |
 | `DimensionsValueObject` | Length, width, height with unit and optional bounds |
 | `NumericRangeValueObject` | Min/max numeric range |
+| `MimeTypeValueObject` | IANA media type (`type/subtype`), lowercased. Methods: `getType()`, `getSubtype()` |
+| `FilenameValueObject` | Uploaded filename; rejects path separators/control chars. Methods: `getExtension()` |
 
 **Usage example:**
 
