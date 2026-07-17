@@ -2,11 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, staging, develop]
   pull_request:
 
+# Push events share one group so develop/staging/main releases are serialized -
+# two channels must never compute versions or publish npm dist-tags concurrently.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || 'release-main' }}
+  group: ${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || 'release-train' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -20,7 +22,7 @@ jobs:
   release:
     name: Release
     needs: ci
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: contains(fromJSON('["refs/heads/main", "refs/heads/staging", "refs/heads/develop"]'), github.ref) && github.event_name == 'push'
     permissions:
       contents: write
       issues: write
