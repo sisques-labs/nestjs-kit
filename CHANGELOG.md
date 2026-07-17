@@ -1,3 +1,25 @@
+## [1.4.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.4.0...v1.4.1) (2026-07-16)
+
+
+### Bug Fixes
+
+* **deps:** move @nestjs/cqrs to peerDependencies ([712f742](https://github.com/sisques-labs/nestjs-kit/commit/712f742cc6810c0b52460a602064d42daf73f32c))
+
+# [1.4.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.3.2...v1.4.0) (2026-07-16)
+
+
+### Features
+
+* **value-objects:** add MimeTypeValueObject and FilenameValueObject ([317e78c](https://github.com/sisques-labs/nestjs-kit/commit/317e78c2325219791e91d6e5b3d8e8e17ba4fcb4))
+
+## [1.3.2](https://github.com/sisques-labs/nestjs-kit/compare/v1.3.1...v1.3.2) (2026-07-15)
+
+
+### Bug Fixes
+
+* **ci:** isolate PR concurrency group from main release group ([812b6bb](https://github.com/sisques-labs/nestjs-kit/commit/812b6bb311b7d9d665e86bb77a14ef1fe6928555))
+* **ci:** run CI on pull requests to any base branch ([92da3d3](https://github.com/sisques-labs/nestjs-kit/commit/92da3d3077676408722161beeae9ced0c17a8124))
+
 ## [1.3.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.3.0...v1.3.1) (2026-07-12)
 
 

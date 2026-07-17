@@ -126,6 +126,11 @@ describe('ValueObject', () => {
       const b = new TestCustomEqualityVO(['a', 'b']);
       expect(a.equals(b)).toBe(true);
     });
+
+    it('returns false when compared to a non-ValueObject', () => {
+      const a = new TestStringVO('hello');
+      expect(a.equals({ value: 'hello' } as any)).toBe(false);
+    });
   });
 
   describe('toPrimitives', () => {
@@ -146,6 +151,21 @@ describe('ValueObject', () => {
       expect(p).toEqual({ content: 'Hi', variables: { k: 'v' } });
       expect(p.variables).not.toBe(vo.value.variables);
     });
+
+    it('returns null/undefined unchanged without attempting to clone', () => {
+      class NullableVO extends ValueObject<string | null> {
+        constructor(private readonly _value: string | null) {
+          super();
+          this.validate();
+        }
+        get value() {
+          return this._value;
+        }
+        protected validate(): void {}
+      }
+
+      expect(new NullableVO(null).toPrimitives()).toBeNull();
+    });
   });
 
   describe('toString', () => {
@@ -155,6 +175,21 @@ describe('ValueObject', () => {
 
     it('returns JSON for objects', () => {
       expect(new TestObjectVO(1, 2).toString()).toBe('{"x":1,"y":2}');
+    });
+
+    it('returns an empty string for null/undefined values', () => {
+      class NullableVO extends ValueObject<string | null> {
+        constructor(private readonly _value: string | null) {
+          super();
+          this.validate();
+        }
+        get value() {
+          return this._value;
+        }
+        protected validate(): void {}
+      }
+
+      expect(new NullableVO(null).toString()).toBe('');
     });
   });
 
@@ -167,6 +202,21 @@ describe('ValueObject', () => {
   describe('isNullOrUndefined', () => {
     it('returns false for defined values', () => {
       expect(new TestStringVO('hello').isNullOrUndefined()).toBe(false);
+    });
+
+    it('returns true for null values', () => {
+      class NullableVO extends ValueObject<string | null> {
+        constructor(private readonly _value: string | null) {
+          super();
+          this.validate();
+        }
+        get value() {
+          return this._value;
+        }
+        protected validate(): void {}
+      }
+
+      expect(new NullableVO(null).isNullOrUndefined()).toBe(true);
     });
   });
 

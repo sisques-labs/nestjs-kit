@@ -31,6 +31,23 @@ describe('IpValueObject', () => {
       );
       expect(() => new IpValueObject('192.168.1')).toThrow(InvalidIpException);
     });
+
+    it('should throw InvalidIpException for invalid IPv6', () => {
+      expect(() => new IpValueObject('gggg::1')).toThrow(InvalidIpException);
+    });
+
+    it('should accept a compressed IPv6 address', () => {
+      const ip = new IpValueObject('::1');
+
+      expect(ip.value).toBe('::1');
+    });
+
+    it('should default to an empty string when value is null or undefined', () => {
+      expect(() => new IpValueObject(null as any)).toThrow(InvalidIpException);
+      expect(() => new IpValueObject(undefined as any)).toThrow(
+        InvalidIpException,
+      );
+    });
   });
 
   describe('equals', () => {
@@ -67,12 +84,40 @@ describe('IpValueObject', () => {
     it('should check if IP is private', () => {
       expect(new IpValueObject('192.168.1.1').isPrivate()).toBe(true);
       expect(new IpValueObject('10.0.0.1').isPrivate()).toBe(true);
+      expect(new IpValueObject('172.16.0.1').isPrivate()).toBe(true);
       expect(new IpValueObject('8.8.8.8').isPrivate()).toBe(false);
+    });
+
+    it('should check if an IPv6 address is private', () => {
+      expect(
+        new IpValueObject(
+          'fc00:0000:0000:0000:0000:0000:0000:0001',
+        ).isPrivate(),
+      ).toBe(true);
+      expect(
+        new IpValueObject(
+          'fd12:0000:0000:0000:0000:0000:0000:0001',
+        ).isPrivate(),
+      ).toBe(true);
+      expect(
+        new IpValueObject(
+          '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+        ).isPrivate(),
+      ).toBe(false);
     });
 
     it('should check if IP is loopback', () => {
       expect(new IpValueObject('127.0.0.1').isLoopback()).toBe(true);
       expect(new IpValueObject('192.168.1.1').isLoopback()).toBe(false);
+    });
+
+    it('should check if an IPv6 address is loopback', () => {
+      expect(new IpValueObject('::1').isLoopback()).toBe(true);
+      expect(
+        new IpValueObject(
+          '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+        ).isLoopback(),
+      ).toBe(false);
     });
 
     it('should get IP version', () => {

@@ -1,6 +1,6 @@
 {
   "name": "@sisques-labs/nestjs-kit",
-  "version": "1.3.1",
+  "version": "1.4.1",
   "description": "NestJS Kit with DDD/CQRS base classes, value objects, repository abstractions, and GraphQL utilities",
   "author": "JSisques",
   "private": false,
@@ -78,14 +78,15 @@
   "peerDependencies": {
     "@apollo/server": ">=4.0.0",
     "@kafkajs/confluent-schema-registry": ">=3.0.0",
+    "@modelcontextprotocol/sdk": ">=1.0.0",
     "@nestjs/apollo": ">=12.0.0",
     "@nestjs/axios": ">=3.0.0",
     "@nestjs/common": ">=10.0.0",
     "@nestjs/config": ">=3.0.0",
     "@nestjs/core": ">=10.0.0",
+    "@nestjs/cqrs": ">=10.0.0",
     "@nestjs/graphql": ">=12.0.0",
     "@nestjs/typeorm": ">=10.0.0",
-    "@modelcontextprotocol/sdk": ">=1.0.0",
     "@willsoto/nestjs-prometheus": ">=6.0.0",
     "express": ">=4.0.0",
     "graphql": ">=16.0.0",
@@ -156,7 +157,6 @@
     }
   },
   "dependencies": {
-    "@nestjs/cqrs": "^11.0.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "dotenv": "^16.0.0",
@@ -167,8 +167,6 @@
     "@apollo/server": "^4.0.0",
     "@kafkajs/confluent-schema-registry": "^4.1.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
     "@nestjs/apollo": "^12.0.0",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/cli": "^10.0.0",
@@ -180,6 +178,8 @@
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@nestjs/typeorm": "^10.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@types/express": "^5.0.6",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
@@ -230,6 +230,14 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
