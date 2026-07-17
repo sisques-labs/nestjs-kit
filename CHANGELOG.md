@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.4.1...v1.5.0) (2026-07-17)
+
+
+### Features
+
+* **release:** add develop/staging channels for alpha/beta npm releases ([b73b15f](https://github.com/sisques-labs/nestjs-kit/commit/b73b15fbd368ac07e0809de9653a22dfa60d05f0))
+
 # [1.5.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.4.1...v1.5.0-beta.1) (2026-07-17)
 
 
