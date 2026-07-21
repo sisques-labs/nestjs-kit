@@ -193,7 +193,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "express": "^5.2.1",
     "graphql": "^17.0.0",
-    "graphql-query-complexity": "^0.12.0",
+    "graphql-query-complexity": "^1.0.0",
     "graphql-type-json": "^0.3.2",
     "husky": "^9.1.7",
     "jest": "^30.0.0",

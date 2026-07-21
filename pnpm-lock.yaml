@@ -106,8 +106,8 @@ importers:
         specifier: ^17.0.0
         version: 17.0.2
       graphql-query-complexity:
-        specifier: ^0.12.0
-        version: 0.12.0(graphql@17.0.2)
+        specifier: ^1.0.0
+        version: 1.1.1(graphql@17.0.2)
       graphql-type-json:
         specifier: ^0.3.2
         version: 0.3.2(graphql@17.0.2)
@@ -2631,10 +2631,10 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
-  graphql-query-complexity@0.12.0:
-    resolution: {integrity: sha512-fWEyuSL6g/+nSiIRgIipfI6UXTI7bAxrpPlCY1c0+V3pAEUo1ybaKmSBgNr1ed2r+agm1plJww8Loig9y6s2dw==}
+  graphql-query-complexity@1.1.1:
+    resolution: {integrity: sha512-q0u1yrPYdEYnhEL4x6xeEoOHdHUV4hISrI/uDFhOaxLvIN60RqlzV3kW6N0f+0pygGM9wjskl1cD5/55G+TPmw==}
     peerDependencies:
-      graphql: ^14.6.0 || ^15.0.0 || ^16.0.0
+      graphql: ^15.0.0 || ^16.0.0
 
   graphql-tag@2.12.6:
     resolution: {integrity: sha512-FdSNcu2QQcWnM2VNvSCCDCVS5PpPqpzgFT8+GXzqJuoDd0CBncxCY278u4mhRO7tMgo2JjgJA5aZ+nWSQ/Z+xg==}
@@ -7522,7 +7522,7 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphql-query-complexity@0.12.0(graphql@17.0.2):
+  graphql-query-complexity@1.1.1(graphql@17.0.2):
     dependencies:
       graphql: 17.0.2
       lodash.get: 4.4.2
