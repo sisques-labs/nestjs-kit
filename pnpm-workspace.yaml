@@ -2,3 +2,4 @@ allowBuilds:
   '@apollo/protobufjs': true
   '@nestjs/core': true
   protobufjs: true
+  unrs-resolver: true
