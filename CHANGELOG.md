@@ -1,9 +1,10 @@
-# [1.5.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.4.1...v1.5.0-beta.1) (2026-07-17)
+# [1.5.0-alpha.2](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.0-alpha.1...v1.5.0-alpha.2) (2026-07-29)
 
 
-### Features
+### Bug Fixes
 
-* **release:** add develop/staging channels for alpha/beta npm releases ([b73b15f](https://github.com/sisques-labs/nestjs-kit/commit/b73b15fbd368ac07e0809de9653a22dfa60d05f0))
+* **ci:** align release job node_version with semantic-release requirement ([e7f46cc](https://github.com/sisques-labs/nestjs-kit/commit/e7f46cc3e16ccfd3878fbafc892bf7a16e4d7549))
+* **deps:** update dependency dotenv to v17 ([423fb1a](https://github.com/sisques-labs/nestjs-kit/commit/423fb1aa8ea80698484695bc56af77d873cd03ae))
 
 # [1.5.0-alpha.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.4.1...v1.5.0-alpha.1) (2026-07-17)
 
