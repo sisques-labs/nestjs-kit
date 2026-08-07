@@ -1,3 +1,17 @@
+# [1.6.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.1...v1.6.0-beta.1) (2026-08-07)
+
+
+### Features
+
+* **value-objects:** add VectorValueObject ([8c74efb](https://github.com/sisques-labs/nestjs-kit/commit/8c74efbaa3003d5716d23b1a76157859ca50977c))
+
+# [1.6.0-alpha.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.1...v1.6.0-alpha.1) (2026-08-07)
+
+
+### Features
+
+* **value-objects:** add VectorValueObject ([8c74efb](https://github.com/sisques-labs/nestjs-kit/commit/8c74efbaa3003d5716d23b1a76157859ca50977c))
+
 ## [1.5.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.0...v1.5.1) (2026-07-29)
 
 
