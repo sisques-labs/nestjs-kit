@@ -1,9 +1,9 @@
-# [1.6.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.1...v1.6.0-beta.1) (2026-08-07)
+# [1.6.0-alpha.2](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.0-alpha.1...v1.6.0-alpha.2) (2026-08-07)
 
 
-### Features
+### Bug Fixes
 
-* **value-objects:** add VectorValueObject ([8c74efb](https://github.com/sisques-labs/nestjs-kit/commit/8c74efbaa3003d5716d23b1a76157859ca50977c))
+* **build:** stop tsc from silently emitting nothing when dist/ is missing ([601bfc7](https://github.com/sisques-labs/nestjs-kit/commit/601bfc79ab96971d729423454594d691569cc23c))
 
 # [1.6.0-alpha.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.1...v1.6.0-alpha.1) (2026-08-07)
 
