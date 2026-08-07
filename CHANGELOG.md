@@ -1,3 +1,18 @@
+# [1.6.0-alpha.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.1...v1.6.0-alpha.1) (2026-08-07)
+
+
+### Features
+
+* **value-objects:** add VectorValueObject ([8c74efb](https://github.com/sisques-labs/nestjs-kit/commit/8c74efbaa3003d5716d23b1a76157859ca50977c))
+
+## [1.5.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.0...v1.5.1) (2026-07-29)
+
+
+### Bug Fixes
+
+* **ci:** align release job node_version with semantic-release requirement ([e7f46cc](https://github.com/sisques-labs/nestjs-kit/commit/e7f46cc3e16ccfd3878fbafc892bf7a16e4d7549))
+* **deps:** update dependency dotenv to v17 ([423fb1a](https://github.com/sisques-labs/nestjs-kit/commit/423fb1aa8ea80698484695bc56af77d873cd03ae))
+
 ## [1.5.1-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.5.0...v1.5.1-beta.1) (2026-07-29)
 
 
