@@ -28,7 +28,7 @@ importers:
         specifier: ^5.0.0
         version: 5.5.1(graphql@17.0.2)
       '@kafkajs/confluent-schema-registry':
-        specifier: ^4.1.0
+        specifier: 4.1.0
         version: 4.1.0
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
