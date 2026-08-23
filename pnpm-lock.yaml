@@ -55,7 +55,7 @@ importers:
         specifier: 11.0.3
         version: 11.0.3(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.28(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/graphql':
-        specifier: ^13.0.0
+        specifier: 13.4.2
         version: 13.4.2(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.28(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2))(class-transformer@0.5.1)(class-validator@0.15.1)(graphql@17.0.2)(reflect-metadata@0.2.2)
       '@nestjs/schematics':
         specifier: ^11.0.0
@@ -5200,7 +5200,7 @@ snapshots:
 
   '@graphql-tools/merge@9.1.9(graphql@17.0.2)':
     dependencies:
-      '@graphql-tools/utils': 11.1.0(graphql@17.0.2)
+      '@graphql-tools/utils': 11.2.2(graphql@17.0.2)
       graphql: 17.0.2
       tslib: 2.8.1
 
@@ -5212,8 +5212,8 @@ snapshots:
 
   '@graphql-tools/schema@10.0.33(graphql@17.0.2)':
     dependencies:
-      '@graphql-tools/merge': 9.1.9(graphql@17.0.2)
-      '@graphql-tools/utils': 11.1.0(graphql@17.0.2)
+      '@graphql-tools/merge': 9.2.2(graphql@17.0.2)
+      '@graphql-tools/utils': 11.2.2(graphql@17.0.2)
       graphql: 17.0.2
       tslib: 2.8.1
 
