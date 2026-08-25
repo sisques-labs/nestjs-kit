@@ -54,6 +54,7 @@ export * from './shared/domain/exceptions/value-objects/invalid-string/invalid-s
 export * from './shared/domain/exceptions/value-objects/invalid-timezone/invalid-timezone.exception';
 export * from './shared/domain/exceptions/value-objects/invalid-url/invalid-url.exception';
 export * from './shared/domain/exceptions/value-objects/invalid-uuid/invalid-uuid.exception';
+export * from './shared/domain/exceptions/value-objects/invalid-vector/invalid-vector.exception';
 
 // Interfaces
 export * from './shared/domain/interfaces/builders/base-builder.interface';
@@ -97,6 +98,7 @@ export * from './shared/domain/value-objects/string/string.vo';
 export * from './shared/domain/value-objects/timezone/timezone.vo';
 export * from './shared/domain/value-objects/url/url.vo';
 export * from './shared/domain/value-objects/uuid/uuid.vo';
+export * from './shared/domain/value-objects/vector/vector.vo';
 
 // View Models
 export * from './shared/domain/view-models/base-view-model/base-view-model';
