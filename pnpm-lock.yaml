@@ -70,7 +70,7 @@ importers:
         specifier: 7.0.0
         version: 7.0.0(semantic-release@25.0.9(typescript@5.9.3))
       '@semantic-release/git':
-        specifier: ^11.0.0
+        specifier: 11.0.1
         version: 11.0.1(semantic-release@25.0.9(typescript@5.9.3))
       '@types/express':
         specifier: ^5.0.6
