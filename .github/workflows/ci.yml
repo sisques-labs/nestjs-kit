@@ -2,47 +2,27 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, staging, develop]
   pull_request:
 
+# Push events share one group so develop/staging/main releases are serialized -
+# two channels must never compute versions or publish npm dist-tags concurrently.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || 'release-main' }}
+  group: ${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || 'release-train' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   ci:
-    name: Lint, Build & Test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7.0.1
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Build
-        run: pnpm build
-
-      - name: Test
-        run: pnpm test:cov
+    name: Lint, Test & Build
+    uses: sisques-labs/workflows/.github/workflows/node-ci.yml@main
+    with:
+      node_version: "24"
+      test_command: "test:cov"
 
   release:
     name: Release
     needs: ci
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: contains(fromJSON('["refs/heads/main", "refs/heads/staging", "refs/heads/develop"]'), github.ref) && github.event_name == 'push'
     permissions:
       contents: write
       issues: write
@@ -50,5 +30,5 @@ jobs:
     uses: sisques-labs/workflows/.github/workflows/node-release.yml@main
     secrets: inherit
     with:
-      node_version: "20"
+      node_version: "24"
       build_command: "build"
