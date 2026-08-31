@@ -184,33 +184,59 @@ export class AppModule {}
 
 ### Base Aggregate
 
-`BaseAggregate` extends `@nestjs/cqrs` **`AggregateRoot`** and wires **`createdAt`** and **`updatedAt`** as `DateValueObject` properties. Add identity and domain fields in your subclass (for example a `UuidValueObject` or app-specific id type).
+`BaseAggregate` extends `@nestjs/cqrs` **`AggregateRoot`** and wires **`id`**, **`createdAt`**, and **`updatedAt`**. Define an aggregate interface extending `IBaseAggregate` for your domain fields:
 
 ```typescript
 import {
   BaseAggregate,
   DateValueObject,
   EmailValueObject,
+  IBaseAggregate,
   UuidValueObject,
 } from '@sisques-labs/nestjs-kit';
 
+interface IUser extends IBaseAggregate {
+  email: EmailValueObject;
+}
+
 export class UserAggregate extends BaseAggregate {
-  constructor(
-    private readonly _id: UuidValueObject,
-    private _email: EmailValueObject,
-    createdAt: DateValueObject,
-    updatedAt: DateValueObject,
-  ) {
-    super(createdAt, updatedAt);
+  private _email: EmailValueObject;
+
+  constructor(props: IUser) {
+    super(props.id, props.createdAt, props.updatedAt);
+    this._email = props.email;
   }
 
-  get id(): UuidValueObject {
-    return this._id;
+  get email(): EmailValueObject {
+    return this._email;
+  }
+
+  changeEmail(email: EmailValueObject): void {
+    const oldValue = this._email.value;
+    const newValue = email.value;
+
+    if (oldValue === newValue) return;
+
+    this._email = email;
+    this.touch();
+
+    this.apply(
+      new UserEmailChangedEvent(
+        this.generateEventMetadata(UserEmailChangedEvent),
+        {
+          id: this.id.value,
+          oldValue,
+          newValue,
+        },
+      ),
+    );
   }
 }
 ```
 
-Use `apply()`, `commit()`, and related `AggregateRoot` APIs for domain events as usual.
+`generateEventMetadata()` fills in `aggregateRootId`, `aggregateRootType`, `entityId`, `entityType`, and `eventType` from the aggregate root. Pass the result to your event constructor and call `apply()` as usual.
+
+Use `commit()` and related `AggregateRoot` APIs to clear uncommitted events after publishing.
 
 ---
 
@@ -397,12 +423,67 @@ export class UserViewModel extends BaseViewModel {
 
 ### Domain Events
 
-`IBaseEventData` and `IEventMetadata` provide a structured shape for domain events with aggregate and entity metadata.
+`BaseEvent`, `IBaseEventData`, and `IEventMetadata` provide a structured shape for domain events with aggregate and entity metadata.
+
+Extend `BaseEvent` for your event classes and build metadata with `generateEventMetadata()`:
 
 ```typescript
-import { IBaseEventData, IEventMetadata } from '@sisques-labs/nestjs-kit';
+import {
+  BaseAggregate,
+  BaseEvent,
+  EmailValueObject,
+  IBaseAggregate,
+  IEventMetadata,
+  IFieldChangedEventData,
+} from '@sisques-labs/nestjs-kit';
 
-// IEventMetadata shape:
+class UserEmailChangedEvent extends BaseEvent<IFieldChangedEventData<string>> {
+  constructor(
+    metadata: IEventMetadata,
+    data: IFieldChangedEventData<string>,
+  ) {
+    super(metadata, data);
+  }
+}
+
+interface IUser extends IBaseAggregate {
+  email: EmailValueObject;
+}
+
+export class UserAggregate extends BaseAggregate {
+  private _email: EmailValueObject;
+
+  constructor(props: IUser) {
+    super(props.id, props.createdAt, props.updatedAt);
+    this._email = props.email;
+  }
+
+  changeEmail(email: EmailValueObject): void {
+    const oldValue = this._email.value;
+    const newValue = email.value;
+
+    if (oldValue === newValue) return;
+
+    this._email = email;
+    this.touch();
+
+    this.apply(
+      new UserEmailChangedEvent(
+        this.generateEventMetadata(UserEmailChangedEvent),
+        {
+          id: this.id.value,
+          oldValue,
+          newValue,
+        },
+      ),
+    );
+  }
+}
+```
+
+`IEventMetadata` fields filled automatically by `generateEventMetadata()`:
+
+```typescript
 // {
 //   aggregateRootId: string;
 //   aggregateRootType: string;
