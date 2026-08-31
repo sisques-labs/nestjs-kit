@@ -32,3 +32,5 @@ jobs:
     with:
       node_version: "24"
       build_command: "build"
+      sync_develop_after_stable: true
+      sync_staging_after_stable: true
