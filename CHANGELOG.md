@@ -1,3 +1,11 @@
+# [1.6.0-alpha.3](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.0-alpha.2...v1.6.0-alpha.3) (2026-08-31)
+
+
+### Features
+
+* **domain:** add generateEventMetadata helper to BaseAggregate ([5d1f071](https://github.com/sisques-labs/nestjs-kit/commit/5d1f071a3c865babcb7dd04cca251b80639eea24))
+* **domain:** wire id into BaseAggregate and add IBaseAggregate ([4e325b7](https://github.com/sisques-labs/nestjs-kit/commit/4e325b75d9b10cc38d46f0d3c5032f007cf44d14))
+
 # [1.6.0-alpha.2](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.0-alpha.1...v1.6.0-alpha.2) (2026-08-07)
 
 
