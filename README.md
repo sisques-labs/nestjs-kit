@@ -209,14 +209,24 @@ export class UserAggregate extends BaseAggregate {
   }
 
   changeEmail(email: EmailValueObject): void {
+    const oldValue = this._email.value;
+    const newValue = email.value;
+
+    if (oldValue === newValue) return;
+
     this._email = email;
+    this.touch();
+
     this.apply(
       new UserEmailChangedEvent(
         this.generateEventMetadata(UserEmailChangedEvent),
-        { email: email.value },
+        {
+          id: this.id.value,
+          oldValue,
+          newValue,
+        },
       ),
     );
-    this.touch();
   }
 }
 ```
@@ -419,11 +429,15 @@ import {
   BaseAggregate,
   BaseEvent,
   IEventMetadata,
+  IFieldChangedEventData,
   UuidValueObject,
 } from '@sisques-labs/nestjs-kit';
 
-class UserEmailChangedEvent extends BaseEvent<{ email: string }> {
-  constructor(metadata: IEventMetadata, data: { email: string }) {
+class UserEmailChangedEvent extends BaseEvent<IFieldChangedEventData<string>> {
+  constructor(
+    metadata: IEventMetadata,
+    data: IFieldChangedEventData<string>,
+  ) {
     super(metadata, data);
   }
 }
@@ -432,14 +446,24 @@ export class UserAggregate extends BaseAggregate {
   // ...
 
   changeEmail(email: EmailValueObject): void {
+    const oldValue = this._email.value;
+    const newValue = email.value;
+
+    if (oldValue === newValue) return;
+
     this._email = email;
+    this.touch();
+
     this.apply(
       new UserEmailChangedEvent(
         this.generateEventMetadata(UserEmailChangedEvent),
-        { email: email.value },
+        {
+          id: this.id.value,
+          oldValue,
+          newValue,
+        },
       ),
     );
-    this.touch();
   }
 }
 ```
