@@ -1,18 +1,30 @@
 import { IEventMetadata } from '@/shared/domain/interfaces/event-metadata.interface';
 import { DateValueObject } from '@/shared/domain/value-objects/date/date.vo';
+import { UuidValueObject } from '@/shared/domain/value-objects/uuid/uuid.vo';
 import { AggregateRoot } from '@nestjs/cqrs';
 
-export abstract class BaseAggregate extends AggregateRoot {
+export class BaseAggregate extends AggregateRoot {
+  protected readonly _id: UuidValueObject;
   protected readonly _createdAt: DateValueObject;
   protected _updatedAt: DateValueObject;
 
-  constructor(createdAt: DateValueObject, updatedAt: DateValueObject) {
+  constructor(
+    id: UuidValueObject,
+    createdAt: DateValueObject,
+    updatedAt: DateValueObject,
+  ) {
     super();
+    this._id = id;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
   }
 
-  abstract get id(): { value: string };
+  /**
+   * Get the id of the aggregate.
+   */
+  public get id(): UuidValueObject {
+    return this._id;
+  }
 
   /**
    * Get the created at of the aggregate.

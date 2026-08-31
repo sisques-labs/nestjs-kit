@@ -12,15 +12,11 @@ class TestEvent extends BaseEvent<{ test: string }> {
 
 class TestAggregate extends BaseAggregate {
   constructor(
-    private readonly _id: UuidValueObject,
+    id: UuidValueObject,
     createdAt: DateValueObject,
     updatedAt: DateValueObject,
   ) {
-    super(createdAt, updatedAt);
-  }
-
-  get id(): UuidValueObject {
-    return this._id;
+    super(id, createdAt, updatedAt);
   }
 
   raiseTestEvent(data: { test: string }): void {
@@ -36,9 +32,10 @@ describe('BaseAggregate', () => {
   const createAggregate = () =>
     new TestAggregate(aggregateId, createdAt, updatedAt);
 
-  it('exposes createdAt and updatedAt from the constructor', () => {
+  it('exposes id, createdAt and updatedAt from the constructor', () => {
     const aggregate = createAggregate();
 
+    expect(aggregate.id).toBe(aggregateId);
     expect(aggregate.createdAt).toBe(createdAt);
     expect(aggregate.updatedAt).toBe(updatedAt);
   });
@@ -50,6 +47,7 @@ describe('BaseAggregate', () => {
     expect(aggregate.updatedAt).toBeInstanceOf(DateValueObject);
     expect(aggregate.updatedAt).not.toBe(updatedAt);
     expect(aggregate.createdAt).toBe(createdAt);
+    expect(aggregate.id).toBe(aggregateId);
   });
 
   describe('generateEventMetadata', () => {

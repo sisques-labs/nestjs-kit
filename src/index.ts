@@ -57,6 +57,7 @@ export * from './shared/domain/exceptions/value-objects/invalid-uuid/invalid-uui
 export * from './shared/domain/exceptions/value-objects/invalid-vector/invalid-vector.exception';
 
 // Interfaces
+export * from './shared/domain/interfaces/base-aggregate.interface';
 export * from './shared/domain/interfaces/builders/base-builder.interface';
 export * from './shared/domain/interfaces/base-aggregate-dto.interface';
 export * from './shared/domain/interfaces/base-view-model-dto.interface';

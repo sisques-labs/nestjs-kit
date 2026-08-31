@@ -184,28 +184,31 @@ export class AppModule {}
 
 ### Base Aggregate
 
-`BaseAggregate` extends `@nestjs/cqrs` **`AggregateRoot`** and wires **`createdAt`** and **`updatedAt`** as `DateValueObject` properties. Add identity and domain fields in your subclass (for example a `UuidValueObject` or app-specific id type).
+`BaseAggregate` extends `@nestjs/cqrs` **`AggregateRoot`** and wires **`id`**, **`createdAt`**, and **`updatedAt`**. Define an aggregate interface extending `IBaseAggregate` for your domain fields:
 
 ```typescript
 import {
   BaseAggregate,
   DateValueObject,
   EmailValueObject,
+  IBaseAggregate,
   UuidValueObject,
 } from '@sisques-labs/nestjs-kit';
 
+interface IUser extends IBaseAggregate {
+  email: EmailValueObject;
+}
+
 export class UserAggregate extends BaseAggregate {
-  constructor(
-    private readonly _id: UuidValueObject,
-    private _email: EmailValueObject,
-    createdAt: DateValueObject,
-    updatedAt: DateValueObject,
-  ) {
-    super(createdAt, updatedAt);
+  private _email: EmailValueObject;
+
+  constructor(props: IUser) {
+    super(props.id, props.createdAt, props.updatedAt);
+    this._email = props.email;
   }
 
-  get id(): UuidValueObject {
-    return this._id;
+  get email(): EmailValueObject {
+    return this._email;
   }
 
   changeEmail(email: EmailValueObject): void {
@@ -428,9 +431,10 @@ Extend `BaseEvent` for your event classes and build metadata with `generateEvent
 import {
   BaseAggregate,
   BaseEvent,
+  EmailValueObject,
+  IBaseAggregate,
   IEventMetadata,
   IFieldChangedEventData,
-  UuidValueObject,
 } from '@sisques-labs/nestjs-kit';
 
 class UserEmailChangedEvent extends BaseEvent<IFieldChangedEventData<string>> {
@@ -442,8 +446,17 @@ class UserEmailChangedEvent extends BaseEvent<IFieldChangedEventData<string>> {
   }
 }
 
+interface IUser extends IBaseAggregate {
+  email: EmailValueObject;
+}
+
 export class UserAggregate extends BaseAggregate {
-  // ...
+  private _email: EmailValueObject;
+
+  constructor(props: IUser) {
+    super(props.id, props.createdAt, props.updatedAt);
+    this._email = props.email;
+  }
 
   changeEmail(email: EmailValueObject): void {
     const oldValue = this._email.value;
