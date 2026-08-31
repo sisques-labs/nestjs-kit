@@ -207,10 +207,23 @@ export class UserAggregate extends BaseAggregate {
   get id(): UuidValueObject {
     return this._id;
   }
+
+  changeEmail(email: EmailValueObject): void {
+    this._email = email;
+    this.apply(
+      new UserEmailChangedEvent(
+        this.generateEventMetadata(UserEmailChangedEvent),
+        { email: email.value },
+      ),
+    );
+    this.touch();
+  }
 }
 ```
 
-Use `apply()`, `commit()`, and related `AggregateRoot` APIs for domain events as usual.
+`generateEventMetadata()` fills in `aggregateRootId`, `aggregateRootType`, `entityId`, `entityType`, and `eventType` from the aggregate root. Pass the result to your event constructor and call `apply()` as usual.
+
+Use `commit()` and related `AggregateRoot` APIs to clear uncommitted events after publishing.
 
 ---
 
@@ -397,12 +410,43 @@ export class UserViewModel extends BaseViewModel {
 
 ### Domain Events
 
-`IBaseEventData` and `IEventMetadata` provide a structured shape for domain events with aggregate and entity metadata.
+`BaseEvent`, `IBaseEventData`, and `IEventMetadata` provide a structured shape for domain events with aggregate and entity metadata.
+
+Extend `BaseEvent` for your event classes and build metadata with `generateEventMetadata()`:
 
 ```typescript
-import { IBaseEventData, IEventMetadata } from '@sisques-labs/nestjs-kit';
+import {
+  BaseAggregate,
+  BaseEvent,
+  IEventMetadata,
+  UuidValueObject,
+} from '@sisques-labs/nestjs-kit';
 
-// IEventMetadata shape:
+class UserEmailChangedEvent extends BaseEvent<{ email: string }> {
+  constructor(metadata: IEventMetadata, data: { email: string }) {
+    super(metadata, data);
+  }
+}
+
+export class UserAggregate extends BaseAggregate {
+  // ...
+
+  changeEmail(email: EmailValueObject): void {
+    this._email = email;
+    this.apply(
+      new UserEmailChangedEvent(
+        this.generateEventMetadata(UserEmailChangedEvent),
+        { email: email.value },
+      ),
+    );
+    this.touch();
+  }
+}
+```
+
+`IEventMetadata` fields filled automatically by `generateEventMetadata()`:
+
+```typescript
 // {
 //   aggregateRootId: string;
 //   aggregateRootType: string;

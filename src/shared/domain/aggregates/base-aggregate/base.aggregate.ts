@@ -1,7 +1,8 @@
+import { IEventMetadata } from '@/shared/domain/interfaces/event-metadata.interface';
 import { DateValueObject } from '@/shared/domain/value-objects/date/date.vo';
 import { AggregateRoot } from '@nestjs/cqrs';
 
-export class BaseAggregate extends AggregateRoot {
+export abstract class BaseAggregate extends AggregateRoot {
   protected readonly _createdAt: DateValueObject;
   protected _updatedAt: DateValueObject;
 
@@ -10,6 +11,8 @@ export class BaseAggregate extends AggregateRoot {
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
   }
+
+  abstract get id(): { value: string };
 
   /**
    * Get the created at of the aggregate.
@@ -36,5 +39,30 @@ export class BaseAggregate extends AggregateRoot {
    */
   public touch(): void {
     this._updatedAt = new DateValueObject(new Date());
+  }
+
+  /**
+   * Builds event metadata for the aggregate root.
+   *
+   * @param EventClass - The domain event class constructor.
+   * @param options - Optional tracing and schema version metadata.
+   */
+  protected generateEventMetadata(
+    EventClass: { name: string },
+    options?: Pick<
+      IEventMetadata,
+      'schemaVersion' | 'correlationId' | 'causationId'
+    >,
+  ): IEventMetadata {
+    const aggregateType = this.constructor.name;
+
+    return {
+      aggregateRootId: this.id.value,
+      aggregateRootType: aggregateType,
+      entityId: this.id.value,
+      entityType: aggregateType,
+      eventType: EventClass.name,
+      ...options,
+    };
   }
 }
