@@ -59,7 +59,6 @@ export * from './shared/domain/exceptions/value-objects/invalid-vector/invalid-v
 // Interfaces
 export * from './shared/domain/interfaces/base-aggregate.interface';
 export * from './shared/domain/interfaces/builders/base-builder.interface';
-export * from './shared/domain/interfaces/base-aggregate-dto.interface';
 export * from './shared/domain/interfaces/base-view-model-dto.interface';
 export * from './shared/domain/interfaces/criteria/filter-field-registry.interface';
 export * from './shared/domain/interfaces/event-metadata.interface';
