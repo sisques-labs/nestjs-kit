@@ -106,6 +106,12 @@ pnpm add graphql @nestjs/graphql @nestjs/apollo @apollo/server graphql-query-com
 # Kafka event publishing / schema registry — only if you import '@sisques-labs/nestjs-kit/kafka'
 pnpm add @kafkajs/confluent-schema-registry @nestjs/axios
 
+# Kafka domain-event forwarding (EventBus -> Kafka) — only if you import '@sisques-labs/nestjs-kit/messaging'
+pnpm add kafkajs @nestjs/config @nestjs/cqrs
+
+# KurrentDB domain-event forwarding (EventBus -> EventStoreDB) — only if you import '@sisques-labs/nestjs-kit/event-store'
+pnpm add @kurrent/kurrentdb-client @nestjs/config @nestjs/cqrs
+
 # class-validator / class-transformer (typical for GraphQL inputs)
 pnpm add class-validator class-transformer
 
@@ -124,6 +130,8 @@ The package has dedicated entry points so importing the root never requires an o
 | `@sisques-labs/nestjs-kit/typeorm` | `typeorm`, `@nestjs/typeorm`, `@nestjs/config` |
 | `@sisques-labs/nestjs-kit/graphql` | `graphql`, `@nestjs/graphql`, `@nestjs/apollo`, `@apollo/server`, `graphql-query-complexity`, `graphql-type-json` |
 | `@sisques-labs/nestjs-kit/kafka` | `@kafkajs/confluent-schema-registry`, `@nestjs/axios` |
+| `@sisques-labs/nestjs-kit/messaging` | `kafkajs`, `@nestjs/config`, `@nestjs/cqrs` |
+| `@sisques-labs/nestjs-kit/event-store` | `@kurrent/kurrentdb-client`, `@nestjs/config`, `@nestjs/cqrs` |
 | `@sisques-labs/nestjs-kit/registered-enums` | Nothing extra — narrow export of the GraphQL enum registration for use before schema generation |
 
 > **Migrating from an earlier version?** MongoDB, TypeORM, GraphQL, and Kafka symbols used to be exported from the package root. Move those specific imports to the matching subpath above; everything else (value objects, base classes, domain enums, exceptions) still imports from `@sisques-labs/nestjs-kit` unchanged.
