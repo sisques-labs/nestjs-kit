@@ -1,3 +1,10 @@
+# [1.6.0-alpha.4](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.0-alpha.3...v1.6.0-alpha.4) (2026-09-04)
+
+
+### Features
+
+* **event-store:** add KurrentDB domain-event forwarding ([715ec55](https://github.com/sisques-labs/nestjs-kit/commit/715ec55742c67d1a85af5c7fa9ff80a987763323))
+
 # [1.6.0-alpha.3](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.0-alpha.2...v1.6.0-alpha.3) (2026-08-31)
 
 
