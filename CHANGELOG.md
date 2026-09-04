@@ -1,4 +1,4 @@
-# [1.7.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.1...v1.7.0-beta.1) (2026-08-31)
+# [1.7.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.1...v1.7.0) (2026-08-31)
 
 
 ### Features
