@@ -1,7 +1,28 @@
-import { AGGREGATE_MODULE_MAP } from './domain/constants/messaging.constants';
+import { DynamicModule } from '@nestjs/common';
+
+import { InboundConsumerBootstrapService } from './application/services/inbound-consumer-bootstrap.service';
+import { InboundHandlerRegistry } from './application/services/inbound-handler-registry.service';
+import {
+  AGGREGATE_MODULE_MAP,
+  INBOUND_CONSUMERS,
+} from './domain/constants/messaging.constants';
 import { EVENT_CONSUMER } from './domain/ports/event-consumer.port';
 import { EVENT_PUBLISHER } from './domain/ports/event-publisher.port';
 import { MessagingModule } from './messaging.module';
+
+function findProviderToken(
+  providers: DynamicModule['providers'],
+  token: unknown,
+): boolean {
+  return !!providers?.some(
+    (provider) =>
+      provider === token ||
+      (typeof provider === 'object' &&
+        provider !== null &&
+        'provide' in provider &&
+        provider.provide === token),
+  );
+}
 
 describe('MessagingModule.forRoot', () => {
   const dynamicModule = MessagingModule.forRoot({ aggregateModuleMap: {} });
@@ -23,5 +44,42 @@ describe('MessagingModule.forRoot', () => {
         p.provide === AGGREGATE_MODULE_MAP,
     );
     expect(provider).toBeDefined();
+  });
+});
+
+describe('MessagingModule.forRoot without inboundConsumers', () => {
+  const dynamicModule = MessagingModule.forRoot({ aggregateModuleMap: {} });
+
+  it('does not register inbound-consumer providers', () => {
+    expect(findProviderToken(dynamicModule.providers, INBOUND_CONSUMERS)).toBe(
+      false,
+    );
+    expect(dynamicModule.providers).not.toContain(InboundHandlerRegistry);
+    expect(dynamicModule.providers).not.toContain(
+      InboundConsumerBootstrapService,
+    );
+  });
+
+  it('still exports EVENT_CONSUMER unchanged', () => {
+    expect(dynamicModule.exports).toEqual([EVENT_PUBLISHER, EVENT_CONSUMER]);
+  });
+});
+
+describe('MessagingModule.forRoot with inboundConsumers', () => {
+  const dynamicModule = MessagingModule.forRoot({
+    aggregateModuleMap: {},
+    inboundConsumers: [{ groupId: 'orders', topics: ['svc.orders'] }],
+  });
+
+  it('registers INBOUND_CONSUMERS, InboundHandlerRegistry, and InboundConsumerBootstrapService', () => {
+    expect(findProviderToken(dynamicModule.providers, INBOUND_CONSUMERS)).toBe(
+      true,
+    );
+    expect(dynamicModule.providers).toContain(InboundHandlerRegistry);
+    expect(dynamicModule.providers).toContain(InboundConsumerBootstrapService);
+  });
+
+  it('does not change the exports array', () => {
+    expect(dynamicModule.exports).toEqual([EVENT_PUBLISHER, EVENT_CONSUMER]);
   });
 });
