@@ -30,6 +30,7 @@
   - [Logging (Winston)](#logging-winston)
   - [MongoDB](#mongodb)
   - [TypeORM](#typeorm)
+  - [Kafka inbound consumers](#kafka-inbound-consumers)
 - [Transport Layer (GraphQL)](#transport-layer-graphql)
   - [Input DTOs](#input-dtos)
   - [Response DTOs](#response-dtos)
@@ -771,6 +772,61 @@ applyCriteriaToQueryBuilder(qb, criteria, {
   },
 });
 ```
+
+---
+
+### Kafka inbound consumers
+
+Declarative subscription and dispatch for inbound Kafka messages, built on the existing `EVENT_CONSUMER` (`IEventConsumer`) port from `@sisques-labs/nestjs-kit/messaging`. Pass `inboundConsumers` to `MessagingModule.forRoot()` and mark handler methods with **`@KafkaMessageHandler`**; the kit discovers them, starts one consumer per declared `groupId`, and routes each message by `topic` + the `event-type` header — it never parses or inspects `value`. Omitting `inboundConsumers` preserves current behavior: no consumer auto-starts.
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import {
+  KafkaMessageHandler,
+  IInboundMessage,
+  IInboundErrorHandler,
+  IInboundHandlerErrorContext,
+  MessagingModule,
+} from '@sisques-labs/nestjs-kit/messaging';
+
+@Injectable()
+export class OrderEventsHandler {
+  @KafkaMessageHandler({ topic: 'my-service.orders', eventType: 'OrderCreated' })
+  async onOrderCreated(message: IInboundMessage): Promise<void> {
+    // message.value is the raw string body — parse/validate it yourself
+  }
+
+  // Omitting eventType makes this a catch-all for every message on the topic
+  @KafkaMessageHandler({ topic: 'my-service.orders' })
+  async onAnyOrderEvent(message: IInboundMessage): Promise<void> {}
+}
+
+@Injectable()
+export class OrderErrorHandler implements IInboundErrorHandler {
+  async onHandlerError({ message, error, groupId, topic }: IInboundHandlerErrorContext): Promise<void> {
+    // Called when a matched handler throws; default behavior (no errorHandler)
+    // is to log and swallow, same as KafkajsEventConsumerAdapter today.
+  }
+}
+
+MessagingModule.forRoot({
+  aggregateModuleMap: AGGREGATE_MODULE_MAP,
+  inboundConsumers: [
+    { groupId: 'orders-worker', topics: ['my-service.orders'], errorHandler: OrderErrorHandler },
+  ],
+});
+```
+
+`OrderEventsHandler` must be registered as a provider in your app (e.g. a feature module) for `InboundHandlerRegistry` to discover it — the `@KafkaMessageHandler` decorator only attaches routing metadata, it does not register anything by itself. `errorHandler` classes are resolved once via `ModuleRef.get(..., { strict: false })` before any consumer starts, so a class that is not registered as a provider anywhere in the app throws at bootstrap rather than on the first failing message.
+
+**Shutdown is a host responsibility.** Like the rest of this package, inbound consumers clean up via `OnModuleDestroy`, which NestJS only runs on `SIGTERM`/`SIGINT` if the host app calls **`app.enableShutdownHooks()`** in `main.ts`:
+
+```typescript
+const app = await NestFactory.create(AppModule);
+app.enableShutdownHooks();
+```
+
+The kit cannot enable this for you — without it, consumer groups will not leave cleanly on process shutdown.
 
 ---
 
