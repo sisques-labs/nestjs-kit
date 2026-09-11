@@ -1,3 +1,13 @@
+# [1.11.0-alpha.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.10.0...v1.11.0-alpha.1) (2026-09-11)
+
+
+### Features
+
+* **messaging:** add domain foundations for declarative Kafka inbound consumers ([2b438a2](https://github.com/sisques-labs/nestjs-kit/commit/2b438a22701dfef0483ae5afb7739cd3008c8207))
+* **messaging:** add InboundConsumerBootstrapService for auto-start and routing ([10ce286](https://github.com/sisques-labs/nestjs-kit/commit/10ce286b81c99b4356d6334c3ee43b07d1fa9e27))
+* **messaging:** add InboundHandlerRegistry for Kafka handler discovery ([a1dc9df](https://github.com/sisques-labs/nestjs-kit/commit/a1dc9df1c489ab18b0eb6fd3c9fa61702932436d))
+* **messaging:** wire inbound Kafka consumers into MessagingModule and public API ([f1cee9a](https://github.com/sisques-labs/nestjs-kit/commit/f1cee9a8fb82497296b2ca85a4880a1681bb71f6))
+
 # [1.10.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.9.0...v1.10.0) (2026-09-06)
 
 
