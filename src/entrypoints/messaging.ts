@@ -6,13 +6,19 @@
 // schema-registry integration — a separate, unrelated concern.
 
 export * from '../shared/messaging/domain/constants/messaging.constants';
+export * from '../shared/messaging/domain/decorators/kafka-message-handler.decorator';
+export * from '../shared/messaging/domain/interfaces/inbound-consumer-options.interface';
 export * from '../shared/messaging/domain/interfaces/inbound-message.interface';
+export * from '../shared/messaging/domain/interfaces/kafka-message-handler-options.interface';
 export * from '../shared/messaging/domain/interfaces/outbound-event.interface';
 export * from '../shared/messaging/domain/ports/event-consumer.port';
 export * from '../shared/messaging/domain/ports/event-publisher.port';
+export * from '../shared/messaging/domain/ports/inbound-error-handler.port';
 export * from '../shared/messaging/domain/routing/event-routing.service';
 
 export * from '../shared/messaging/application/services/domain-event-forwarder.service';
+export * from '../shared/messaging/application/services/inbound-consumer-bootstrap.service';
+export * from '../shared/messaging/application/services/inbound-handler-registry.service';
 
 export * from '../shared/messaging/infrastructure/kafka/kafka-config.interface';
 export * from '../shared/messaging/infrastructure/kafka/kafkajs-event-consumer.adapter';

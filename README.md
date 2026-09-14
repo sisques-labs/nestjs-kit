@@ -30,11 +30,14 @@
   - [Logging (Winston)](#logging-winston)
   - [MongoDB](#mongodb)
   - [TypeORM](#typeorm)
+  - [Kafka inbound consumers](#kafka-inbound-consumers)
 - [Transport Layer (GraphQL)](#transport-layer-graphql)
   - [Input DTOs](#input-dtos)
   - [Response DTOs](#response-dtos)
   - [Mappers](#mappers)
   - [Complexity Plugin](#complexity-plugin)
+- [Auth Client (Sisques Account JWT)](#auth-client-sisques-account-jwt)
+- [RBAC (Tenant Permissions)](#rbac-tenant-permissions)
 - [Enums](#enums)
 
 ---
@@ -106,6 +109,15 @@ pnpm add graphql @nestjs/graphql @nestjs/apollo @apollo/server graphql-query-com
 # Kafka event publishing / schema registry — only if you import '@sisques-labs/nestjs-kit/kafka'
 pnpm add @kafkajs/confluent-schema-registry @nestjs/axios
 
+# Kafka domain-event forwarding (EventBus -> Kafka) — only if you import '@sisques-labs/nestjs-kit/messaging'
+pnpm add kafkajs @nestjs/config @nestjs/cqrs
+
+# KurrentDB domain-event forwarding (EventBus -> EventStoreDB) — only if you import '@sisques-labs/nestjs-kit/event-store'
+pnpm add @kurrent/kurrentdb-client @nestjs/config @nestjs/cqrs
+
+# Sisques Account JWT verification — only if you import '@sisques-labs/nestjs-kit/auth-client'
+pnpm add @nestjs/jwt
+
 # class-validator / class-transformer (typical for GraphQL inputs)
 pnpm add class-validator class-transformer
 
@@ -124,6 +136,10 @@ The package has dedicated entry points so importing the root never requires an o
 | `@sisques-labs/nestjs-kit/typeorm` | `typeorm`, `@nestjs/typeorm`, `@nestjs/config` |
 | `@sisques-labs/nestjs-kit/graphql` | `graphql`, `@nestjs/graphql`, `@nestjs/apollo`, `@apollo/server`, `graphql-query-complexity`, `graphql-type-json` |
 | `@sisques-labs/nestjs-kit/kafka` | `@kafkajs/confluent-schema-registry`, `@nestjs/axios` |
+| `@sisques-labs/nestjs-kit/messaging` | `kafkajs`, `@nestjs/config`, `@nestjs/cqrs` |
+| `@sisques-labs/nestjs-kit/event-store` | `@kurrent/kurrentdb-client`, `@nestjs/config`, `@nestjs/cqrs` |
+| `@sisques-labs/nestjs-kit/rbac` | `@nestjs/graphql` (only if you guard GraphQL resolvers), `express` |
+| `@sisques-labs/nestjs-kit/auth-client` | `@nestjs/jwt`, `@nestjs/graphql` (only if you guard GraphQL resolvers), `express` |
 | `@sisques-labs/nestjs-kit/registered-enums` | Nothing extra — narrow export of the GraphQL enum registration for use before schema generation |
 
 > **Migrating from an earlier version?** MongoDB, TypeORM, GraphQL, and Kafka symbols used to be exported from the package root. Move those specific imports to the matching subpath above; everything else (value objects, base classes, domain enums, exceptions) still imports from `@sisques-labs/nestjs-kit` unchanged.
@@ -184,33 +200,59 @@ export class AppModule {}
 
 ### Base Aggregate
 
-`BaseAggregate` extends `@nestjs/cqrs` **`AggregateRoot`** and wires **`createdAt`** and **`updatedAt`** as `DateValueObject` properties. Add identity and domain fields in your subclass (for example a `UuidValueObject` or app-specific id type).
+`BaseAggregate` extends `@nestjs/cqrs` **`AggregateRoot`** and wires **`id`**, **`createdAt`**, and **`updatedAt`**. Define an aggregate interface extending `IBaseAggregate` for your domain fields:
 
 ```typescript
 import {
   BaseAggregate,
   DateValueObject,
   EmailValueObject,
+  IBaseAggregate,
   UuidValueObject,
 } from '@sisques-labs/nestjs-kit';
 
+interface IUser extends IBaseAggregate {
+  email: EmailValueObject;
+}
+
 export class UserAggregate extends BaseAggregate {
-  constructor(
-    private readonly _id: UuidValueObject,
-    private _email: EmailValueObject,
-    createdAt: DateValueObject,
-    updatedAt: DateValueObject,
-  ) {
-    super(createdAt, updatedAt);
+  private _email: EmailValueObject;
+
+  constructor(props: IUser) {
+    super(props.id, props.createdAt, props.updatedAt);
+    this._email = props.email;
   }
 
-  get id(): UuidValueObject {
-    return this._id;
+  get email(): EmailValueObject {
+    return this._email;
+  }
+
+  changeEmail(email: EmailValueObject): void {
+    const oldValue = this._email.value;
+    const newValue = email.value;
+
+    if (oldValue === newValue) return;
+
+    this._email = email;
+    this.touch();
+
+    this.apply(
+      new UserEmailChangedEvent(
+        this.generateEventMetadata(UserEmailChangedEvent),
+        {
+          id: this.id.value,
+          oldValue,
+          newValue,
+        },
+      ),
+    );
   }
 }
 ```
 
-Use `apply()`, `commit()`, and related `AggregateRoot` APIs for domain events as usual.
+`generateEventMetadata()` fills in `aggregateRootId`, `aggregateRootType`, `entityId`, `entityType`, and `eventType` from the aggregate root. Pass the result to your event constructor and call `apply()` as usual.
+
+Use `commit()` and related `AggregateRoot` APIs to clear uncommitted events after publishing.
 
 ---
 
@@ -397,12 +439,67 @@ export class UserViewModel extends BaseViewModel {
 
 ### Domain Events
 
-`IBaseEventData` and `IEventMetadata` provide a structured shape for domain events with aggregate and entity metadata.
+`BaseEvent`, `IBaseEventData`, and `IEventMetadata` provide a structured shape for domain events with aggregate and entity metadata.
+
+Extend `BaseEvent` for your event classes and build metadata with `generateEventMetadata()`:
 
 ```typescript
-import { IBaseEventData, IEventMetadata } from '@sisques-labs/nestjs-kit';
+import {
+  BaseAggregate,
+  BaseEvent,
+  EmailValueObject,
+  IBaseAggregate,
+  IEventMetadata,
+  IFieldChangedEventData,
+} from '@sisques-labs/nestjs-kit';
 
-// IEventMetadata shape:
+class UserEmailChangedEvent extends BaseEvent<IFieldChangedEventData<string>> {
+  constructor(
+    metadata: IEventMetadata,
+    data: IFieldChangedEventData<string>,
+  ) {
+    super(metadata, data);
+  }
+}
+
+interface IUser extends IBaseAggregate {
+  email: EmailValueObject;
+}
+
+export class UserAggregate extends BaseAggregate {
+  private _email: EmailValueObject;
+
+  constructor(props: IUser) {
+    super(props.id, props.createdAt, props.updatedAt);
+    this._email = props.email;
+  }
+
+  changeEmail(email: EmailValueObject): void {
+    const oldValue = this._email.value;
+    const newValue = email.value;
+
+    if (oldValue === newValue) return;
+
+    this._email = email;
+    this.touch();
+
+    this.apply(
+      new UserEmailChangedEvent(
+        this.generateEventMetadata(UserEmailChangedEvent),
+        {
+          id: this.id.value,
+          oldValue,
+          newValue,
+        },
+      ),
+    );
+  }
+}
+```
+
+`IEventMetadata` fields filled automatically by `generateEventMetadata()`:
+
+```typescript
 // {
 //   aggregateRootId: string;
 //   aggregateRootType: string;
@@ -678,6 +775,61 @@ applyCriteriaToQueryBuilder(qb, criteria, {
 
 ---
 
+### Kafka inbound consumers
+
+Declarative subscription and dispatch for inbound Kafka messages, built on the existing `EVENT_CONSUMER` (`IEventConsumer`) port from `@sisques-labs/nestjs-kit/messaging`. Pass `inboundConsumers` to `MessagingModule.forRoot()` and mark handler methods with **`@KafkaMessageHandler`**; the kit discovers them, starts one consumer per declared `groupId`, and routes each message by `topic` + the `event-type` header — it never parses or inspects `value`. Omitting `inboundConsumers` preserves current behavior: no consumer auto-starts.
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import {
+  KafkaMessageHandler,
+  IInboundMessage,
+  IInboundErrorHandler,
+  IInboundHandlerErrorContext,
+  MessagingModule,
+} from '@sisques-labs/nestjs-kit/messaging';
+
+@Injectable()
+export class OrderEventsHandler {
+  @KafkaMessageHandler({ topic: 'my-service.orders', eventType: 'OrderCreated' })
+  async onOrderCreated(message: IInboundMessage): Promise<void> {
+    // message.value is the raw string body — parse/validate it yourself
+  }
+
+  // Omitting eventType makes this a catch-all for every message on the topic
+  @KafkaMessageHandler({ topic: 'my-service.orders' })
+  async onAnyOrderEvent(message: IInboundMessage): Promise<void> {}
+}
+
+@Injectable()
+export class OrderErrorHandler implements IInboundErrorHandler {
+  async onHandlerError({ message, error, groupId, topic }: IInboundHandlerErrorContext): Promise<void> {
+    // Called when a matched handler throws; default behavior (no errorHandler)
+    // is to log and swallow, same as KafkajsEventConsumerAdapter today.
+  }
+}
+
+MessagingModule.forRoot({
+  aggregateModuleMap: AGGREGATE_MODULE_MAP,
+  inboundConsumers: [
+    { groupId: 'orders-worker', topics: ['my-service.orders'], errorHandler: OrderErrorHandler },
+  ],
+});
+```
+
+`OrderEventsHandler` must be registered as a provider in your app (e.g. a feature module) for `InboundHandlerRegistry` to discover it — the `@KafkaMessageHandler` decorator only attaches routing metadata, it does not register anything by itself. `errorHandler` classes are resolved once via `ModuleRef.get(..., { strict: false })` before any consumer starts, so a class that is not registered as a provider anywhere in the app throws at bootstrap rather than on the first failing message.
+
+**Shutdown is a host responsibility.** Like the rest of this package, inbound consumers clean up via `OnModuleDestroy`, which NestJS only runs on `SIGTERM`/`SIGINT` if the host app calls **`app.enableShutdownHooks()`** in `main.ts`:
+
+```typescript
+const app = await NestFactory.create(AppModule);
+app.enableShutdownHooks();
+```
+
+The kit cannot enable this for you — without it, consumer groups will not leave cleanly on process shutdown.
+
+---
+
 ## Transport Layer (GraphQL)
 
 If you use **`@nestjs/graphql`**, call **`registerSharedGraphqlEnums()`** once before schema generation (for example at the top of `main.ts` before `NestFactory.create`, or from a small module imported by `AppModule`). Add **`MutationResponseGraphQLMapper`** and **`ComplexityPlugin`** to your own GraphQL module’s **`providers`** when you use them—this package does **not** register them via **`SharedModule`**.
@@ -878,6 +1030,142 @@ import { ComplexityPlugin } from '@sisques-labs/nestjs-kit/graphql';
 })
 export class GraphqlPluginsModule {}
 ```
+
+---
+
+## Auth Client (Sisques Account JWT)
+
+`@sisques-labs/nestjs-kit/auth-client` verifies the access token issued by
+**Sisques Account** — the platform's shared identity/tenancy service
+(`account-api`) — and populates `request.user` with its claims (`sub`,
+`email`, `platformAdmin`, `tenants: Array<{ tenantId, role }>`). Consuming
+apps never talk to the identity provider (Keycloak, etc.) directly, only to
+Sisques Account; this module trusts whatever token it already signed, using
+the same secret. Pair it with [RBAC](#rbac-tenant-permissions) for
+tenant-scoped authorization on top of the same `tenants` claim.
+
+Register it once, globally, typically from your app's core/shared module:
+
+```typescript
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtModuleOptions } from '@nestjs/jwt';
+import { AuthClientModule } from '@sisques-labs/nestjs-kit/auth-client';
+
+@Module({
+  imports: [
+    AuthClientModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService): JwtModuleOptions => ({
+        secret: config.getOrThrow<string>('auth.jwtSecret'),
+      }),
+    }),
+  ],
+})
+export class CoreModule {}
+```
+
+Then use `JwtAuthGuard` and `@CurrentUser()` in any REST controller or
+GraphQL resolver:
+
+```typescript
+import {
+  CurrentUser,
+  CurrentUserPayload,
+  JwtAuthGuard,
+} from '@sisques-labs/nestjs-kit/auth-client';
+
+@UseGuards(JwtAuthGuard)
+@Get('me')
+whoAmI(@CurrentUser() user: CurrentUserPayload) {
+  return user;
+}
+```
+
+`PlatformAdminGuard` is also exported, for endpoints that require
+`platformAdmin: true` on the token — must run after `JwtAuthGuard`:
+
+```typescript
+@UseGuards(JwtAuthGuard, PlatformAdminGuard)
+@Delete(':id')
+async deleteAnything(@Param('id') id: string) { /* ... */ }
+```
+
+**Not shared:** signing tokens (login/register, Keycloak adapter) stays in
+Sisques Account itself — this package only ever verifies.
+
+---
+
+## RBAC (Tenant Permissions)
+
+`@sisques-labs/nestjs-kit/rbac` gives you the **mechanism** for enforcing
+tenant-scoped permissions on top of a JWT that carries a `tenants: Array<{
+tenantId, role }>` claim (the shape `account-api` issues) — it never ships a
+permission enum or a role→permission mapping, because what each role should
+be allowed to do is inherently specific to your app. You bring your own
+permission type and your own map; this package gives you the guard and
+decorator that read them.
+
+```typescript
+import { JwtAuthGuard } from '@sisques-labs/nestjs-kit/auth-client';
+import {
+  createTenantPermissionGuard,
+  RequiresTenantPermission,
+} from '@sisques-labs/nestjs-kit/rbac';
+
+// 1. Your own permissions
+enum GardenPermission {
+  VIEW_PLANTS = 'VIEW_PLANTS',
+  WATER_PLANT = 'WATER_PLANT',
+  DELETE_PLANT = 'DELETE_PLANT',
+  INVITE_GARDENER = 'INVITE_GARDENER',
+}
+
+// 2. Your own TenantRole -> Permission[] map (roles come from the JWT:
+// account-api's fixed OWNER / ADMIN / MEMBER — what each one unlocks in
+// your domain is entirely up to you)
+const GARDEN_ROLE_PERMISSIONS: Record<string, GardenPermission[]> = {
+  OWNER: [
+    GardenPermission.VIEW_PLANTS,
+    GardenPermission.WATER_PLANT,
+    GardenPermission.DELETE_PLANT,
+    GardenPermission.INVITE_GARDENER,
+  ],
+  ADMIN: [GardenPermission.VIEW_PLANTS, GardenPermission.WATER_PLANT, GardenPermission.INVITE_GARDENER],
+  MEMBER: [GardenPermission.VIEW_PLANTS, GardenPermission.WATER_PLANT],
+};
+
+// 3. Your own guard, built from the shared factory
+const GardenPermissionGuard = createTenantPermissionGuard({
+  rolePermissions: GARDEN_ROLE_PERMISSIONS,
+  // Optional — defaults to reading the REST `:tenantId` route param or a
+  // GraphQL `tenantId` / `input.tenantId` arg. Override when your app
+  // names the route param differently (e.g. `gardenId`):
+  // resolveTenantId: (context) => context.switchToHttp().getRequest().params.gardenId,
+});
+
+// 4. Wire it per endpoint, after your own JWT guard
+@Delete(':gardenId/plants/:plantId')
+@UseGuards(JwtAuthGuard, GardenPermissionGuard)
+@RequiresTenantPermission(GardenPermission.DELETE_PLANT)
+async deletePlant(@Param('gardenId') gardenId: string) {
+  /* ... */
+}
+```
+
+**How it works:** the guard reads `@RequiresTenantPermission()`'s metadata
+off the handler, resolves the target `tenantId`, finds the caller's
+membership for that tenant in `request.user.tenants` (already populated by
+your own JWT guard — this factory never verifies a token itself), and
+throws `ForbiddenException` if there's no membership or the role's
+permissions don't include the one required. Works for both REST controllers
+and GraphQL resolvers out of the box.
+
+**Not shared:** the permission enum and the role→permission map are always
+yours — copying that policy between apps (or worse, forcing every app onto
+one shared map) would couple unrelated domains together. Only the
+plumbing — reading the claim, resolving the tenant id, comparing against
+your map — is common enough to live here.
 
 ---
 

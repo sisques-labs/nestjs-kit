@@ -1,8 +1,14 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { DiscoveryModule } from '@nestjs/core';
 
 import { DomainEventForwarderService } from './application/services/domain-event-forwarder.service';
-import { AGGREGATE_MODULE_MAP } from './domain/constants/messaging.constants';
+import { InboundConsumerBootstrapService } from './application/services/inbound-consumer-bootstrap.service';
+import { InboundHandlerRegistry } from './application/services/inbound-handler-registry.service';
+import {
+  AGGREGATE_MODULE_MAP,
+  INBOUND_CONSUMERS,
+} from './domain/constants/messaging.constants';
 import { EVENT_CONSUMER } from './domain/ports/event-consumer.port';
 import { EVENT_PUBLISHER } from './domain/ports/event-publisher.port';
 import { EventRoutingService } from './domain/routing/event-routing.service';
@@ -39,24 +45,50 @@ import { IMessagingModuleOptions } from './messaging-module-options.interface';
  * declared in this same module, ever needs it), the consumer is meant to be
  * injected directly by feature modules elsewhere in the app.
  *
+ * Also registers the optional declarative inbound-consumer feature when
+ * `inboundConsumers` is supplied: `InboundHandlerRegistry` discovers every
+ * `@KafkaMessageHandler`-decorated method, and `InboundConsumerBootstrapService`
+ * starts one Kafka consumer per entry and routes matching messages to them.
+ * Both providers, and `DiscoveryModule`'s scan cost, only apply when
+ * `inboundConsumers` is non-empty — omitting it preserves current behavior.
+ *
  * @example
  * ```ts
- * MessagingModule.forRoot({ aggregateModuleMap: AGGREGATE_MODULE_MAP })
+ * MessagingModule.forRoot({
+ *   aggregateModuleMap: AGGREGATE_MODULE_MAP,
+ *   inboundConsumers: [
+ *     { groupId: 'orders', topics: ['svc.orders'], errorHandler: OrderErrorHandler },
+ *   ],
+ * })
  * ```
+ * When `inboundConsumers` is used, call `app.enableShutdownHooks()` in
+ * `main.ts` so consumer groups leave cleanly on SIGTERM/SIGINT — this is a
+ * host-application responsibility the kit cannot enable itself.
  */
 @Module({})
 export class MessagingModule {
   static forRoot(options: IMessagingModuleOptions): DynamicModule {
+    const inboundConsumers = options.inboundConsumers ?? [];
+
+    const inboundProviders: Provider[] = inboundConsumers.length
+      ? [
+          { provide: INBOUND_CONSUMERS, useValue: inboundConsumers },
+          InboundHandlerRegistry,
+          InboundConsumerBootstrapService,
+        ]
+      : [];
+
     return {
       module: MessagingModule,
       global: true,
-      imports: [CqrsModule],
+      imports: [CqrsModule, DiscoveryModule],
       providers: [
         { provide: AGGREGATE_MODULE_MAP, useValue: options.aggregateModuleMap },
         EventRoutingService,
         DomainEventForwarderService,
         { provide: EVENT_PUBLISHER, useClass: KafkajsEventPublisherAdapter },
         { provide: EVENT_CONSUMER, useClass: KafkajsEventConsumerAdapter },
+        ...inboundProviders,
       ],
       exports: [EVENT_PUBLISHER, EVENT_CONSUMER],
     };

@@ -1,3 +1,119 @@
+# [1.11.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.10.0...v1.11.0) (2026-09-11)
+
+
+### Features
+
+* **messaging:** add domain foundations for declarative Kafka inbound consumers ([2b438a2](https://github.com/sisques-labs/nestjs-kit/commit/2b438a22701dfef0483ae5afb7739cd3008c8207))
+* **messaging:** add InboundConsumerBootstrapService for auto-start and routing ([10ce286](https://github.com/sisques-labs/nestjs-kit/commit/10ce286b81c99b4356d6334c3ee43b07d1fa9e27))
+* **messaging:** add InboundHandlerRegistry for Kafka handler discovery ([a1dc9df](https://github.com/sisques-labs/nestjs-kit/commit/a1dc9df1c489ab18b0eb6fd3c9fa61702932436d))
+* **messaging:** wire inbound Kafka consumers into MessagingModule and public API ([f1cee9a](https://github.com/sisques-labs/nestjs-kit/commit/f1cee9a8fb82497296b2ca85a4880a1681bb71f6))
+
+# [1.11.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.10.0...v1.11.0-beta.1) (2026-09-11)
+
+
+### Features
+
+* **messaging:** add domain foundations for declarative Kafka inbound consumers ([2b438a2](https://github.com/sisques-labs/nestjs-kit/commit/2b438a22701dfef0483ae5afb7739cd3008c8207))
+* **messaging:** add InboundConsumerBootstrapService for auto-start and routing ([10ce286](https://github.com/sisques-labs/nestjs-kit/commit/10ce286b81c99b4356d6334c3ee43b07d1fa9e27))
+* **messaging:** add InboundHandlerRegistry for Kafka handler discovery ([a1dc9df](https://github.com/sisques-labs/nestjs-kit/commit/a1dc9df1c489ab18b0eb6fd3c9fa61702932436d))
+* **messaging:** wire inbound Kafka consumers into MessagingModule and public API ([f1cee9a](https://github.com/sisques-labs/nestjs-kit/commit/f1cee9a8fb82497296b2ca85a4880a1681bb71f6))
+
+# [1.11.0-alpha.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.10.0...v1.11.0-alpha.1) (2026-09-11)
+
+
+### Features
+
+* **messaging:** add domain foundations for declarative Kafka inbound consumers ([2b438a2](https://github.com/sisques-labs/nestjs-kit/commit/2b438a22701dfef0483ae5afb7739cd3008c8207))
+* **messaging:** add InboundConsumerBootstrapService for auto-start and routing ([10ce286](https://github.com/sisques-labs/nestjs-kit/commit/10ce286b81c99b4356d6334c3ee43b07d1fa9e27))
+* **messaging:** add InboundHandlerRegistry for Kafka handler discovery ([a1dc9df](https://github.com/sisques-labs/nestjs-kit/commit/a1dc9df1c489ab18b0eb6fd3c9fa61702932436d))
+* **messaging:** wire inbound Kafka consumers into MessagingModule and public API ([f1cee9a](https://github.com/sisques-labs/nestjs-kit/commit/f1cee9a8fb82497296b2ca85a4880a1681bb71f6))
+
+# [1.10.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.9.0...v1.10.0) (2026-09-06)
+
+
+### Features
+
+* **auth-client:** add Sisques Account JWT verification module ([02ed7e2](https://github.com/sisques-labs/nestjs-kit/commit/02ed7e213cb67edbd502c141a80045fe9fbda24a))
+
+# [1.10.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.9.0...v1.10.0-beta.1) (2026-09-06)
+
+
+### Features
+
+* **auth-client:** add Sisques Account JWT verification module ([02ed7e2](https://github.com/sisques-labs/nestjs-kit/commit/02ed7e213cb67edbd502c141a80045fe9fbda24a))
+
+# [1.10.0-alpha.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.9.0...v1.10.0-alpha.1) (2026-09-06)
+
+
+### Features
+
+* **auth-client:** add Sisques Account JWT verification module ([02ed7e2](https://github.com/sisques-labs/nestjs-kit/commit/02ed7e213cb67edbd502c141a80045fe9fbda24a))
+
+# [1.9.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.8.0...v1.9.0) (2026-09-06)
+
+
+### Bug Fixes
+
+* **rbac:** use sisqueslabs namespace prefix for the metadata key ([d8823ee](https://github.com/sisques-labs/nestjs-kit/commit/d8823ee251d5bbfcd5d0b95303c7599930623b7d))
+
+
+### Features
+
+* **rbac:** add tenant-permission guard factory ([e67b17e](https://github.com/sisques-labs/nestjs-kit/commit/e67b17ec0ca2b3c145278982f60ded8aa248e266))
+
+# [1.9.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.8.0...v1.9.0-beta.1) (2026-09-06)
+
+
+### Bug Fixes
+
+* **rbac:** use sisqueslabs namespace prefix for the metadata key ([d8823ee](https://github.com/sisques-labs/nestjs-kit/commit/d8823ee251d5bbfcd5d0b95303c7599930623b7d))
+
+
+### Features
+
+* **rbac:** add tenant-permission guard factory ([e67b17e](https://github.com/sisques-labs/nestjs-kit/commit/e67b17ec0ca2b3c145278982f60ded8aa248e266))
+
+# [1.9.0-alpha.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.8.0...v1.9.0-alpha.1) (2026-09-06)
+
+
+### Bug Fixes
+
+* **rbac:** use sisqueslabs namespace prefix for the metadata key ([d8823ee](https://github.com/sisques-labs/nestjs-kit/commit/d8823ee251d5bbfcd5d0b95303c7599930623b7d))
+
+
+### Features
+
+* **rbac:** add tenant-permission guard factory ([e67b17e](https://github.com/sisques-labs/nestjs-kit/commit/e67b17ec0ca2b3c145278982f60ded8aa248e266))
+
+# [1.8.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.7.0...v1.8.0) (2026-09-04)
+
+
+### Features
+
+* **event-store:** add KurrentDB domain-event forwarding ([715ec55](https://github.com/sisques-labs/nestjs-kit/commit/715ec55742c67d1a85af5c7fa9ff80a987763323))
+
+# [1.8.0-beta.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.7.0...v1.8.0-beta.1) (2026-09-04)
+
+
+### Features
+
+* **event-store:** add KurrentDB domain-event forwarding ([715ec55](https://github.com/sisques-labs/nestjs-kit/commit/715ec55742c67d1a85af5c7fa9ff80a987763323))
+
+# [1.7.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.1...v1.7.0) (2026-08-31)
+
+
+### Features
+
+* **domain:** add generateEventMetadata helper to BaseAggregate ([5d1f071](https://github.com/sisques-labs/nestjs-kit/commit/5d1f071a3c865babcb7dd04cca251b80639eea24))
+* **domain:** wire id into BaseAggregate and add IBaseAggregate ([4e325b7](https://github.com/sisques-labs/nestjs-kit/commit/4e325b75d9b10cc38d46f0d3c5032f007cf44d14))
+
+## [1.6.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.0...v1.6.1) (2026-08-07)
+
+
+### Bug Fixes
+
+* **build:** stop tsc from silently emitting nothing when dist/ is missing ([601bfc7](https://github.com/sisques-labs/nestjs-kit/commit/601bfc79ab96971d729423454594d691569cc23c))
+
 # [1.6.0-alpha.2](https://github.com/sisques-labs/nestjs-kit/compare/v1.6.0-alpha.1...v1.6.0-alpha.2) (2026-08-07)
 
 

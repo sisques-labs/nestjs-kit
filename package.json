@@ -1,6 +1,6 @@
 {
   "name": "@sisques-labs/nestjs-kit",
-  "version": "1.6.0-alpha.2",
+  "version": "1.11.0",
   "description": "NestJS Kit with DDD/CQRS base classes, value objects, repository abstractions, and GraphQL utilities",
   "author": "JSisques",
   "private": false,
@@ -52,6 +52,21 @@
       "require": "./dist/entrypoints/messaging.js",
       "import": "./dist/entrypoints/messaging.js",
       "types": "./dist/entrypoints/messaging.d.ts"
+    },
+    "./event-store": {
+      "require": "./dist/entrypoints/event-store.js",
+      "import": "./dist/entrypoints/event-store.js",
+      "types": "./dist/entrypoints/event-store.d.ts"
+    },
+    "./rbac": {
+      "require": "./dist/entrypoints/rbac.js",
+      "import": "./dist/entrypoints/rbac.js",
+      "types": "./dist/entrypoints/rbac.d.ts"
+    },
+    "./auth-client": {
+      "require": "./dist/entrypoints/auth-client.js",
+      "import": "./dist/entrypoints/auth-client.js",
+      "types": "./dist/entrypoints/auth-client.d.ts"
     },
     "./registered-enums": {
       "require": "./dist/shared/transport/graphql/enums/shared-registered-enums.graphql.js",
@@ -119,6 +134,9 @@
     "@nestjs/graphql": {
       "optional": true
     },
+    "@nestjs/jwt": {
+      "optional": true
+    },
     "@nestjs/typeorm": {
       "optional": true
     },
@@ -126,6 +144,9 @@
       "optional": true
     },
     "@willsoto/nestjs-prometheus": {
+      "optional": true
+    },
+    "@kurrent/kurrentdb-client": {
       "optional": true
     },
     "express": {
