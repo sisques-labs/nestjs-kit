@@ -81,6 +81,28 @@ describe('applyCriteriaToQueryBuilder', () => {
       expect(qb.andWhere).toHaveBeenCalledWith(expectedSql, expectedParams);
     });
 
+    it.each([
+      [FilterOperator.IS_NULL, 'entity.name IS NULL'],
+      [FilterOperator.IS_NOT_NULL, 'entity.name IS NOT NULL'],
+    ])('translates %s into %s without a parameter', (operator, expectedSql) => {
+      const criteria = new Criteria([{ field: 'name', operator }]);
+
+      applyCriteriaToQueryBuilder(qb, criteria, { alias: 'entity' });
+
+      expect(qb.andWhere).toHaveBeenCalledTimes(1);
+      expect(qb.andWhere.mock.calls[0]).toEqual([expectedSql]);
+    });
+
+    it('ignores a value supplied with a null operator', () => {
+      const criteria = new Criteria([
+        { field: 'name', operator: FilterOperator.IS_NULL, value: 'rose' },
+      ]);
+
+      applyCriteriaToQueryBuilder(qb, criteria, { alias: 'entity' });
+
+      expect(qb.andWhere.mock.calls[0]).toEqual(['entity.name IS NULL']);
+    });
+
     it('translates LIKE into a case-insensitive ILIKE with wildcards', () => {
       const criteria = new Criteria([
         { field: 'name', operator: FilterOperator.LIKE, value: 'ros' },

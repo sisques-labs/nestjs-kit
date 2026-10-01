@@ -1,4 +1,18 @@
+import {
+  Args,
+  GraphQLSchemaBuilderModule,
+  GraphQLSchemaFactory,
+  Query,
+  Resolver,
+} from '@nestjs/graphql';
+import { Test } from '@nestjs/testing';
+import { isInputObjectType, isNonNullType } from 'graphql';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+
 import { FilterOperator } from '@/shared/domain/enums/filter-operator.enum';
+
+import { registerSharedGraphqlEnums } from '@/shared/transport/graphql/register-shared-graphql-enums';
 
 import { BaseFilterInput } from './base-filter.input';
 
@@ -106,5 +120,89 @@ describe('BaseFilterInput', () => {
     filter.value = false;
 
     expect(filter.value).toBe(false);
+  });
+
+  describe('validation', () => {
+    const validateFilter = (plain: Record<string, unknown>) =>
+      validate(plainToInstance(BaseFilterInput, plain));
+
+    it.each([FilterOperator.IS_NULL, FilterOperator.IS_NOT_NULL])(
+      'accepts %s without a value',
+      async (operator) => {
+        const errors = await validateFilter({ field: 'deletedAt', operator });
+
+        expect(errors).toHaveLength(0);
+      },
+    );
+
+    it('accepts a null operator with a null value', async () => {
+      const errors = await validateFilter({
+        field: 'deletedAt',
+        operator: FilterOperator.IS_NULL,
+        value: null,
+      });
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('rejects EQUALS without a value', async () => {
+      const errors = await validateFilter({
+        field: 'status',
+        operator: FilterOperator.EQUALS,
+      });
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].property).toBe('value');
+    });
+
+    it('accepts EQUALS with a false value', async () => {
+      const errors = await validateFilter({
+        field: 'isVerified',
+        operator: FilterOperator.EQUALS,
+        value: false,
+      });
+
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('GraphQL schema', () => {
+    @Resolver()
+    class FilterProbeResolver {
+      @Query(() => Boolean)
+      probe(@Args('filter') _filter: BaseFilterInput): boolean {
+        return true;
+      }
+    }
+
+    const buildSchemaFields = async () => {
+      registerSharedGraphqlEnums();
+      const moduleRef = await Test.createTestingModule({
+        imports: [GraphQLSchemaBuilderModule],
+      }).compile();
+      const schema = await moduleRef
+        .get(GraphQLSchemaFactory)
+        .create([FilterProbeResolver]);
+      const inputType = schema.getType('BaseFilterInput');
+      if (!isInputObjectType(inputType)) {
+        throw new Error('BaseFilterInput is not an input object type');
+      }
+
+      return inputType.getFields();
+    };
+
+    it('exposes `value` as a nullable JSON field', async () => {
+      const fields = await buildSchemaFields();
+
+      expect(isNonNullType(fields.value.type)).toBe(false);
+      expect(String(fields.value.type)).toBe('JSON');
+    });
+
+    it('keeps `field` and `operator` required', async () => {
+      const fields = await buildSchemaFields();
+
+      expect(String(fields.field.type)).toBe('String!');
+      expect(String(fields.operator.type)).toBe('FilterOperator!');
+    });
   });
 });

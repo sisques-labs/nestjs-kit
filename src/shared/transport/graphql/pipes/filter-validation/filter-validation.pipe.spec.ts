@@ -166,4 +166,74 @@ describe('FilterValidationPipe', () => {
 
     expect(() => pipe.transform(input)).toThrow(BadRequestException);
   });
+
+  describe('null operators', () => {
+    it.each([FilterOperator.IS_NULL, FilterOperator.IS_NOT_NULL])(
+      'accepts %s without a value',
+      (operator) => {
+        const pipe = new FilterValidationPipe(registry);
+        const input = { filters: [{ field: 'createdAt', operator }] };
+
+        expect(pipe.transform(input)).toBe(input);
+      },
+    );
+
+    it('ignores a value supplied with a null operator', () => {
+      const pipe = new FilterValidationPipe(registry);
+      const input = {
+        filters: [
+          {
+            field: 'age',
+            operator: FilterOperator.IS_NULL,
+            value: 'not-a-number',
+          },
+        ],
+      };
+
+      expect(() => pipe.transform(input)).not.toThrow();
+    });
+
+    it('still rejects a null operator on an unknown field', () => {
+      const pipe = new FilterValidationPipe(registry);
+      const input = {
+        filters: [{ field: 'password', operator: FilterOperator.IS_NULL }],
+      };
+
+      expect(() => pipe.transform(input)).toThrow(
+        /Unknown filter field: "password"/,
+      );
+    });
+  });
+
+  describe('missing value', () => {
+    it.each([
+      ['undefined', undefined],
+      ['null', null],
+    ])('rejects EQUALS with a %s value', (_label, value) => {
+      const pipe = new FilterValidationPipe(registry);
+      const input = {
+        filters: [{ field: 'name', operator: FilterOperator.EQUALS, value }],
+      };
+
+      expect(() => pipe.transform(input)).toThrow(BadRequestException);
+      expect(() => pipe.transform(input)).toThrow(
+        'Missing value for filter field "name" with operator "eq"',
+      );
+    });
+
+    it('still accepts a false value for a boolean field', () => {
+      const pipe = new FilterValidationPipe(registry);
+      const input = {
+        filters: [
+          {
+            field: 'isVerified',
+            operator: FilterOperator.EQUALS,
+            value: false,
+          },
+        ],
+      };
+
+      expect(() => pipe.transform(input)).not.toThrow();
+    });
+  });
 });

@@ -4,7 +4,7 @@ import { SortDirection } from '@/shared/domain/enums/sort-direction.enum';
 export interface Filter {
   field: string;
   operator: FilterOperator;
-  value: any;
+  value?: any;
 }
 
 export interface Sort {
