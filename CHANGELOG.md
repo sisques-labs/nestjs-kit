@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/sisques-labs/nestjs-kit/compare/v1.12.0...v1.12.1) (2026-10-01)
+
+
+### Bug Fixes
+
+* **criteria:** cast LIKE to text and escape wildcards ([7d3a881](https://github.com/sisques-labs/nestjs-kit/commit/7d3a881e15493a9403a9c4ff398c73fb6fa72036)), closes [#212](https://github.com/sisques-labs/nestjs-kit/issues/212)
+
 # [1.12.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.11.0...v1.12.0) (2026-10-01)
 
 
