@@ -630,10 +630,20 @@ export class UserMongoReadRepository extends BaseMongoDatabaseRepository {
 | `NOT_EQUALS` | `$ne` |
 | `LIKE` | `$regex` |
 | `IN` | `$in` |
-| `GT` | `$gt` |
-| `LT` | `$lt` |
-| `GTE` | `$gte` |
-| `LTE` | `$lte` |
+| `GREATER_THAN` | `$gt` |
+| `LESS_THAN` | `$lt` |
+| `GREATER_THAN_OR_EQUAL` | `$gte` |
+| `LESS_THAN_OR_EQUAL` | `$lte` |
+| `IS_NULL` | `{ $eq: null }` |
+| `IS_NOT_NULL` | `{ $ne: null }` |
+
+Notes:
+
+- `IS_NULL` (`{ $eq: null }`) also matches documents where the field is
+  missing entirely, not only those where it is explicitly `null`.
+- The Mongo translator assigns one condition per field name, so two filters on
+  the same field overwrite each other (the last one wins). Combine conditions
+  for the same field in a custom query instead.
 
 #### Base DTO
 
@@ -719,7 +729,7 @@ type UserTypeormDto = BaseTypeormDto & {
 #### Criteria → QueryBuilder
 
 `applyCriteriaToQueryBuilder` translates a `Criteria`'s `filters`/`sorts` into
-`WHERE`/`ORDER BY` clauses on a TypeORM `SelectQueryBuilder`, covering all 8
+`WHERE`/`ORDER BY` clauses on a TypeORM `SelectQueryBuilder`, covering all 10
 `FilterOperator` values with index-scoped parameter names (`filter0`,
 `filter1`, ...) so the same field can appear more than once (e.g. a date
 range) without parameter collisions. It mutates and returns the same builder
@@ -1186,10 +1196,12 @@ FilterOperator.EQUALS     // 'eq'
 FilterOperator.NOT_EQUALS // 'ne'
 FilterOperator.LIKE       // 'like'
 FilterOperator.IN         // 'in'
-FilterOperator.GT         // 'gt'
-FilterOperator.LT         // 'lt'
-FilterOperator.GTE        // 'gte'
-FilterOperator.LTE        // 'lte'
+FilterOperator.GREATER_THAN          // 'gt'
+FilterOperator.LESS_THAN             // 'lt'
+FilterOperator.GREATER_THAN_OR_EQUAL // 'gte'
+FilterOperator.LESS_THAN_OR_EQUAL    // 'lte'
+FilterOperator.IS_NULL               // 'isnull' (no value required)
+FilterOperator.IS_NOT_NULL           // 'notnull' (no value required)
 
 SortDirection.ASC
 SortDirection.DESC

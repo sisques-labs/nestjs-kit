@@ -1,6 +1,9 @@
 import { BadRequestException, PipeTransform } from '@nestjs/common';
 
-import { FilterOperator } from '@/shared/domain/enums/filter-operator.enum';
+import {
+  FilterOperator,
+  isNullFilterOperator,
+} from '@/shared/domain/enums/filter-operator.enum';
 import {
   FilterFieldDescriptor,
   FilterFieldRegistry,
@@ -32,6 +35,13 @@ export class FilterValidationPipe<
       if (!descriptor) {
         throw new BadRequestException(
           `Unknown filter field: "${filter.field}"`,
+        );
+      }
+      // Null operators carry no operand; any supplied value is ignored.
+      if (isNullFilterOperator(filter.operator)) continue;
+      if (filter.value === undefined || filter.value === null) {
+        throw new BadRequestException(
+          `Missing value for filter field "${filter.field}" with operator "${filter.operator}"`,
         );
       }
       this.validateValue(

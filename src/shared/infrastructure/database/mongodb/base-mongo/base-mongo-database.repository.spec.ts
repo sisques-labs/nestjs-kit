@@ -172,6 +172,26 @@ describe('BaseMongoDatabaseRepository', () => {
       });
     });
 
+    it('should build query with IS_NULL operator', () => {
+      const criteria = new Criteria([
+        { field: 'deletedAt', operator: FilterOperator.IS_NULL },
+      ]);
+
+      const query = repository['buildMongoQuery'](criteria);
+
+      expect(query).toEqual({ deletedAt: { $eq: null } });
+    });
+
+    it('should build query with IS_NOT_NULL operator', () => {
+      const criteria = new Criteria([
+        { field: 'deletedAt', operator: FilterOperator.IS_NOT_NULL },
+      ]);
+
+      const query = repository['buildMongoQuery'](criteria);
+
+      expect(query).toEqual({ deletedAt: { $ne: null } });
+    });
+
     it('should build query with multiple filters', () => {
       const criteria = new Criteria([
         { field: 'status', operator: FilterOperator.EQUALS, value: 'active' },

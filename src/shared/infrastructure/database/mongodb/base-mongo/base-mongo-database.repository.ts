@@ -64,6 +64,12 @@ export abstract class BaseMongoDatabaseRepository extends BaseDatabaseRepository
           case FilterOperator.LESS_THAN_OR_EQUAL:
             query[filter.field] = { $lte: filter.value };
             break;
+          case FilterOperator.IS_NULL:
+            query[filter.field] = { $eq: null };
+            break;
+          case FilterOperator.IS_NOT_NULL:
+            query[filter.field] = { $ne: null };
+            break;
           default:
             break;
         }

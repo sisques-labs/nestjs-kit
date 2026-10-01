@@ -27,7 +27,7 @@ export interface ApplyCriteriaToQueryBuilderOptions<
  * `ORDER BY` clauses on a TypeORM {@link SelectQueryBuilder}, mutating and
  * returning the same builder for chaining (e.g. `.skip().take()`).
  *
- * Covers all 8 {@link FilterOperator} values. Each filter gets an
+ * Covers all 10 {@link FilterOperator} values. Each filter gets an
  * index-scoped query parameter name (`filter0`, `filter1`, ...) so the same
  * field can appear more than once (e.g. a date range using `GREATER_THAN_OR_EQUAL`
  * + `LESS_THAN_OR_EQUAL`) without parameter collisions.
@@ -100,6 +100,12 @@ function applyFilter<Entity extends ObjectLiteral>(
       break;
     case FilterOperator.LESS_THAN_OR_EQUAL:
       qb.andWhere(`${column} <= :${param}`, { [param]: filter.value });
+      break;
+    case FilterOperator.IS_NULL:
+      qb.andWhere(`${column} IS NULL`);
+      break;
+    case FilterOperator.IS_NOT_NULL:
+      qb.andWhere(`${column} IS NOT NULL`);
       break;
   }
 }
