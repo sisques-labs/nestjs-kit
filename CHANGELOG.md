@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.11.0...v1.12.0) (2026-10-01)
+
+
+### Features
+
+* **criteria:** add IS_NULL and IS_NOT_NULL filter operators ([82d373f](https://github.com/sisques-labs/nestjs-kit/commit/82d373fddcf63d1c242bfdb46c1e9807f97c2e6a)), closes [#211](https://github.com/sisques-labs/nestjs-kit/issues/211)
+
 # [1.11.0](https://github.com/sisques-labs/nestjs-kit/compare/v1.10.0...v1.11.0) (2026-09-11)
 
 
