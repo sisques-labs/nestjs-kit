@@ -158,6 +158,7 @@ For contributors working on this repository:
 | `pnpm lint:check` | ESLint without autofix (used by **Husky pre-commit**). |
 | `pnpm test` | Jest unit tests (`*.spec.ts` under `src/`). |
 | `pnpm test:cov` | Tests with coverage. |
+| `pnpm test:int` | Opt-in PostgreSQL integration tests (`test/integration/**/*.int-spec.ts`); requires Docker. |
 | `pnpm format` | Prettier on `src` and `test` TypeScript. |
 
 **Git hooks:** [Husky](https://typicode.github.io/husky/) runs **`pnpm lint:check`** and **`pnpm test`** on **pre-commit** (see `.husky/pre-commit`). To skip hooks for a one-off commit: `HUSKY=0 git commit ...`.
@@ -782,6 +783,24 @@ applyCriteriaToQueryBuilder(qb, criteria, {
   },
 });
 ```
+
+**`LIKE` semantics (PostgreSQL).** `FilterOperator.LIKE` is a case-insensitive
+"contains" match on the column's text form:
+`CAST(alias.col AS text) ILIKE '%value%' ESCAPE '\'`. Because of the cast it
+works on `date`, `timestamp(tz)`, numeric and `uuid` columns as well as text.
+The value is a literal: `%`, `_` and `\` are escaped, so `50%` matches only
+text containing `50%` (not `500`). Notes:
+
+- The cast prevents a plain btree index on the column from being used. For hot
+  paths, add an expression index, e.g. `CREATE INDEX ON t (((col)::text))`
+  (a `pg_trgm` GIN index on that expression also speeds up contains matches).
+- Non-text values are matched against their PostgreSQL text rendering; dates
+  and timestamps follow the session `DateStyle` (ISO by default, e.g.
+  `2024-03-15`).
+- Behavior is verified against TypeORM 1.x only; the peer range
+  (`typeorm >=0.3.0`) is unchanged.
+- Run the PostgreSQL integration suite (needs Docker, Testcontainers) with
+  `pnpm test:int`. It is opt-in and not part of `pnpm test`.
 
 ---
 

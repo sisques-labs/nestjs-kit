@@ -103,16 +103,50 @@ describe('applyCriteriaToQueryBuilder', () => {
       expect(qb.andWhere.mock.calls[0]).toEqual(['entity.name IS NULL']);
     });
 
-    it('translates LIKE into a case-insensitive ILIKE with wildcards', () => {
+    it('translates LIKE into a text-cast, case-insensitive contains match', () => {
       const criteria = new Criteria([
         { field: 'name', operator: FilterOperator.LIKE, value: 'ros' },
       ]);
 
       applyCriteriaToQueryBuilder(qb, criteria, { alias: 'entity' });
 
-      expect(qb.andWhere).toHaveBeenCalledWith('entity.name ILIKE :filter0', {
-        filter0: '%ros%',
-      });
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        "CAST(entity.name AS text) ILIKE :filter0 ESCAPE '\\'",
+        { filter0: '%ros%' },
+      );
+    });
+
+    it.each([
+      ['percent', '50%', '%50\\%%'],
+      ['underscore', 'a_b', '%a\\_b%'],
+      ['backslash', 'c:\\x', '%c:\\\\x%'],
+    ])(
+      'escapes the %s wildcard in the LIKE value so it matches literally',
+      (_label, value, expectedParam) => {
+        const criteria = new Criteria([
+          { field: 'name', operator: FilterOperator.LIKE, value },
+        ]);
+
+        applyCriteriaToQueryBuilder(qb, criteria, { alias: 'entity' });
+
+        expect(qb.andWhere).toHaveBeenCalledWith(
+          "CAST(entity.name AS text) ILIKE :filter0 ESCAPE '\\'",
+          { filter0: expectedParam },
+        );
+      },
+    );
+
+    it('coerces a non-string LIKE value to a string before escaping', () => {
+      const criteria = new Criteria([
+        { field: 'quantity', operator: FilterOperator.LIKE, value: 42 as any },
+      ]);
+
+      applyCriteriaToQueryBuilder(qb, criteria, { alias: 'entity' });
+
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        "CAST(entity.quantity AS text) ILIKE :filter0 ESCAPE '\\'",
+        { filter0: '%42%' },
+      );
     });
 
     it('translates IN with an array value as-is', () => {

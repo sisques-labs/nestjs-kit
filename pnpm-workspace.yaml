@@ -1,5 +1,7 @@
 allowBuilds:
   '@apollo/protobufjs': true
   '@nestjs/core': true
+  cpu-features: false
   protobufjs: true
+  ssh2: false
   unrs-resolver: true
