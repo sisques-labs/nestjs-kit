@@ -3,6 +3,8 @@ import { ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { Criteria, Filter, Sort } from '@/shared/domain/entities/criteria';
 import { FilterOperator } from '@/shared/domain/enums/filter-operator.enum';
 
+import { escapeLikePattern } from './escape-like-pattern';
+
 /**
  * Options for {@link applyCriteriaToQueryBuilder}.
  */
@@ -31,6 +33,12 @@ export interface ApplyCriteriaToQueryBuilderOptions<
  * index-scoped query parameter name (`filter0`, `filter1`, ...) so the same
  * field can appear more than once (e.g. a date range using `GREATER_THAN_OR_EQUAL`
  * + `LESS_THAN_OR_EQUAL`) without parameter collisions.
+ *
+ * `LIKE` is a case-insensitive "contains" match on the column's text form: the
+ * column is cast (`CAST(col AS text) ILIKE ... ESCAPE '\'`) so it also works on
+ * date, timestamp, numeric and uuid columns, and `%`, `_` and `\` in the value
+ * are matched literally. Note the cast prevents a plain btree index on the
+ * column from being used; add an expression index on `((col::text))` if needed.
  *
  * Does not apply pagination or tenant scoping — callers remain responsible
  * for `.skip()/.take()` (see `BaseDatabaseRepository.calculatePagination`)
@@ -80,8 +88,8 @@ function applyFilter<Entity extends ObjectLiteral>(
       qb.andWhere(`${column} != :${param}`, { [param]: filter.value });
       break;
     case FilterOperator.LIKE:
-      qb.andWhere(`${column} ILIKE :${param}`, {
-        [param]: `%${filter.value}%`,
+      qb.andWhere(`CAST(${column} AS text) ILIKE :${param} ESCAPE '\\'`, {
+        [param]: `%${escapeLikePattern(String(filter.value))}%`,
       });
       break;
     case FilterOperator.IN:
