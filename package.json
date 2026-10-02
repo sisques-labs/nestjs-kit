@@ -93,7 +93,7 @@
   "peerDependencies": {
     "@apollo/server": "5.5.1",
     "@kafkajs/confluent-schema-registry": "4.1.0",
-    "@modelcontextprotocol/sdk": "1.30.0",
+    "@modelcontextprotocol/sdk": "1.32.0",
     "@nestjs/apollo": "13.4.5",
     "@nestjs/axios": "4.0.1",
     "@nestjs/common": "11.2.3",
@@ -189,7 +189,7 @@
   "devDependencies": {
     "@apollo/server": "5.5.1",
     "@kafkajs/confluent-schema-registry": "4.1.0",
-    "@modelcontextprotocol/sdk": "1.30.0",
+    "@modelcontextprotocol/sdk": "1.32.0",
     "@nestjs/apollo": "13.4.5",
     "@nestjs/axios": "4.0.1",
     "@nestjs/cli": "11.0.24",
