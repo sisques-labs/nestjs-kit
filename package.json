@@ -5,7 +5,7 @@
   "author": "JSisques",
   "private": false,
   "license": "MIT",
-  "packageManager": "pnpm@11.17.0",
+  "packageManager": "pnpm@11.28.5",
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
